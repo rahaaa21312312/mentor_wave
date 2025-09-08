@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, BookOpen, MapPin, Clock, DollarSign, Star, Search, Filter, Plus, Menu, X, Home, Users, Settings, LogOut } from 'lucide-react';
+import { User, BookOpen, MapPin, Clock, DollarSign, Star, Search, Filter, Plus, Menu, X, Home, Users, Settings, LogOut, MessageCircle, Phone, Mail, Send } from 'lucide-react';
 
 interface Tuition {
   id: string;
@@ -32,6 +32,12 @@ interface TutorProfile {
   totalStudents: number;
   subjects: string[];
   bio: string;
+}
+
+interface ContactModalProps {
+  tuition: Tuition;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 const mockTuitions: Tuition[] = [
@@ -126,6 +132,209 @@ const mockUser: TutorProfile = {
   bio: 'Passionate about teaching and helping fellow students excel in their academic journey.'
 };
 
+const ContactModal: React.FC<ContactModalProps> = ({ tuition, isOpen, onClose }) => {
+  const [message, setMessage] = useState('');
+  const [activeTab, setActiveTab] = useState<'info' | 'message'>('info');
+
+  if (!isOpen) return null;
+
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      alert(`Message sent to ${tuition.tutor.name}: "${message}"`);
+      setMessage('');
+      onClose();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900">Contact Tutor</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('info')}
+            className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+              activeTab === 'info'
+                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            Tutor Info
+          </button>
+          <button
+            onClick={() => setActiveTab('message')}
+            className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+              activeTab === 'message'
+                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            Send Message
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {activeTab === 'info' && (
+            <div className="space-y-6">
+              {/* Tutor Profile */}
+              <div className="flex items-center space-x-4">
+                <img
+                  src={tuition.tutor.avatar}
+                  alt={tuition.tutor.name}
+                  className="h-20 w-20 rounded-full"
+                />
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900">{tuition.tutor.name}</h3>
+                  <p className="text-gray-600">{tuition.tutor.department} • {tuition.tutor.year}</p>
+                  <div className="flex items-center space-x-1 mt-1">
+                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                    <span className="text-sm font-medium text-gray-700">{tuition.tutor.rating} Rating</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tuition Details */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 mb-3">{tuition.title}</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <BookOpen className="h-4 w-4" />
+                    <span>{tuition.subject} • {tuition.level}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{tuition.location}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Clock className="h-4 w-4" />
+                    <span>{tuition.schedule}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-green-600 font-semibold">
+                    <DollarSign className="h-4 w-4" />
+                    <span>{tuition.fee}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
+                <p className="text-gray-700">{tuition.description}</p>
+              </div>
+
+              {/* Requirements */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Requirements</h4>
+                <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  {tuition.requirements.map((req, index) => (
+                    <li key={index}>{req}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Contact Options */}
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setActiveTab('message')}
+                  className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 flex items-center justify-center space-x-2"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  <span>Send Message</span>
+                </button>
+                <button className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2">
+                  <Phone className="h-5 w-5" />
+                  <span>Call Now</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'message' && (
+            <div className="space-y-4">
+              {/* Tutor Info Header */}
+              <div className="flex items-center space-x-3 pb-4 border-b border-gray-200">
+                <img
+                  src={tuition.tutor.avatar}
+                  alt={tuition.tutor.name}
+                  className="h-12 w-12 rounded-full"
+                />
+                <div>
+                  <h3 className="font-semibold text-gray-900">{tuition.tutor.name}</h3>
+                  <p className="text-sm text-gray-600">{tuition.tutor.department}</p>
+                </div>
+              </div>
+
+              {/* Message Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Message
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={6}
+                  placeholder={`Hi ${tuition.tutor.name}, I'm interested in your ${tuition.subject} tutoring. Could you please provide more details about...`}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                />
+              </div>
+
+              {/* Quick Message Templates */}
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Quick Templates:</p>
+                <div className="space-y-2">
+                  {[
+                    "I'm interested in your tutoring services. Can we discuss the details?",
+                    "What's your availability for this week?",
+                    "Could you share more about your teaching methodology?"
+                  ].map((template, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setMessage(template)}
+                      className="block w-full text-left text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-2 rounded transition-colors"
+                    >
+                      "{template}"
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Send Button */}
+              <div className="flex space-x-3 pt-4">
+                <button
+                  onClick={() => setActiveTab('info')}
+                  className="flex-1 border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                >
+                  Back to Info
+                </button>
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!message.trim()}
+                  className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Send className="h-5 w-5" />
+                  <span>Send Message</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [currentPage, setCurrentPage] = useState<'landing' | 'login' | 'register' | 'dashboard' | 'post-tuition' | 'profile'>('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -133,6 +342,10 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [contactModal, setContactModal] = useState<{ isOpen: boolean; tuition: Tuition | null }>({
+    isOpen: false,
+    tuition: null
+  });
 
   // Demo login credentials
   const demoCredentials = [
@@ -157,6 +370,14 @@ function App() {
     setIsLoggedIn(false);
     setUser(null);
     setCurrentPage('landing');
+  };
+
+  const handleContactTutor = (tuition: Tuition) => {
+    setContactModal({ isOpen: true, tuition });
+  };
+
+  const closeContactModal = () => {
+    setContactModal({ isOpen: false, tuition: null });
   };
 
   const filteredTuitions = mockTuitions.filter(tuition => {
@@ -660,8 +881,12 @@ function App() {
                   </div>
                 </div>
 
-                <button className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium">
-                  Contact Tutor
+                <button 
+                  onClick={() => handleContactTutor(tuition)}
+                  className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium flex items-center justify-center space-x-2"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  <span>Contact Tutor</span>
                 </button>
               </div>
             </div>
@@ -676,6 +901,15 @@ function App() {
           </div>
         )}
       </main>
+
+      {/* Contact Modal */}
+      {contactModal.tuition && (
+        <ContactModal
+          tuition={contactModal.tuition}
+          isOpen={contactModal.isOpen}
+          onClose={closeContactModal}
+        />
+      )}
     </div>
   );
 
