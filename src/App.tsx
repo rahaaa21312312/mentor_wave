@@ -43,14 +43,14 @@ interface ContactModalProps {
 const mockTuitions: Tuition[] = [
   {
     id: '1',
-    title: 'Advanced Mathematics Tutoring',
-    subject: 'Mathematics',
-    level: 'HSC',
-    location: 'Chittagong',
-    schedule: 'Mon, Wed, Fri - 7:00 PM',
-    fee: '3000 BDT/month',
+    title: 'Debi ke poraba',
+    subject: 'Programming',
+    level: 'University',
+    location: 'CUET-Campus',
+    schedule: 'Daily Porabi Beta',
+    fee: '90000 BDT/month',
     tutor: {
-      name: 'Ahmed Hassan',
+      name: 'Sajnin Akter',
       department: 'CSE',
       year: '4th Year',
       rating: 4.8,
