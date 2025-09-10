@@ -1,1251 +1,919 @@
-import React, { useState } from 'react';
-import { 
-  Search, 
-  MapPin, 
-  Clock, 
-  DollarSign, 
-  Star, 
-  MessageCircle, 
-  Phone, 
-  User, 
-  BookOpen, 
-  Calendar, 
-  Filter,
-  Plus,
-  Home,
-  Users,
-  Bell,
-  Settings,
-  Heart,
-  ThumbsUp,
-  Send,
-  X,
-  CheckCircle,
-  AlertCircle,
-  GraduationCap,
-  Building
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, Users, Star, ArrowRight, Menu, X, User, LogOut, Search, Filter, MapPin, Clock, DollarSign, GraduationCap, MessageCircle, Heart } from 'lucide-react';
 
-// Enhanced demo data based on the screenshots
-const demoTuitions = [
+// Types
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'student' | 'tutor';
+  department?: string;
+  year?: number;
+  subjects?: string[];
+  rating?: number;
+  hourlyRate?: number;
+  bio?: string;
+  avatar?: string;
+}
+
+interface Tutor {
+  id: string;
+  name: string;
+  department: string;
+  subjects: string[];
+  rating: number;
+  reviews: number;
+  hourlyRate: number;
+  experience: string;
+  bio: string;
+  avatar: string;
+  availability: string[];
+  location: string;
+}
+
+// Sample data
+const sampleTutors: Tutor[] = [
   {
-    id: 1,
-    poster: {
-      name: "Bushra Muntaha BM",
-      avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      department: "Computer Science & Engineering",
-      year: "4th Year",
-      rating: 4.8,
-      completedTuitions: 15
-    },
-    title: "Male tutor needed",
-    description: "Apatoto #booked",
-    studentLevel: "Inter 2nd year",
-    location: "Andarkilla",
-    preferredTutor: "3rd or 4th year preferable",
-    subjects: ["Math", "Physics"],
-    salary: "Negotiable",
-    additionalInfo: "(Local preferable)",
-    timePosted: "11h",
-    status: "booked",
-    likes: 3,
-    comments: 8,
-    likedBy: ["Maheea Chowdhury", "8 others"],
-    contactInfo: {
-      phone: "+880 1712-345678",
-      email: "bushra.muntaha@student.cuet.ac.bd"
-    }
+    id: '1',
+    name: 'Sarah Ahmed',
+    department: 'Computer Science & Engineering',
+    subjects: ['Data Structures', 'Algorithms', 'Programming'],
+    rating: 4.9,
+    reviews: 127,
+    hourlyRate: 800,
+    experience: '3 years',
+    bio: 'Final year CSE student with expertise in competitive programming and software development.',
+    avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+    availability: ['Mon 2-6 PM', 'Wed 3-7 PM', 'Fri 1-5 PM'],
+    location: 'CUET Campus'
   },
   {
-    id: 2,
-    poster: {
-      name: "Salsabil Nirjona",
-      avatar: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      department: "Electrical & Electronic Engineering",
-      year: "3rd Year",
-      rating: 4.9,
-      completedTuitions: 22
-    },
-    title: "Female tutor needed",
-    description: "Engineering Admission",
-    studentLevel: "HSC candidate",
-    location: "জামাল খান, লিচুবাগান (সেইন)",
-    preferredTutor: "Female tutor preferred",
-    subjects: ["Physics", "Chemistry", "Math"],
-    salary: "Negotiable",
-    additionalInfo: "Weekly 3 days",
-    timePosted: "6 September at 17:32",
-    status: "available",
-    likes: 6,
-    comments: 5,
-    likedBy: ["Maheea Chowdhury", "5 others"],
-    contactInfo: {
-      phone: "+880 1812-345679",
-      email: "salsabil.nirjona@student.cuet.ac.bd"
-    }
+    id: '2',
+    name: 'Rafiq Hassan',
+    department: 'Electrical & Electronic Engineering',
+    subjects: ['Circuit Analysis', 'Electronics', 'Control Systems'],
+    rating: 4.8,
+    reviews: 89,
+    hourlyRate: 750,
+    experience: '2 years',
+    bio: 'EEE student passionate about electronics and helping others understand complex circuits.',
+    avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+    availability: ['Tue 4-8 PM', 'Thu 2-6 PM', 'Sat 10 AM-2 PM'],
+    location: 'CUET Campus'
   },
   {
-    id: 3,
-    poster: {
-      name: "মো সুহেল আকফজাল",
-      avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      department: "Civil Engineering",
-      year: "2nd Year",
-      rating: 4.6,
-      completedTuitions: 8
-    },
-    title: "Female Tutor Needed",
-    description: "Looking for experienced tutor",
-    studentLevel: "Class-9",
-    location: "Chandgaon Abasik",
-    preferredTutor: "Female preferred",
-    subjects: ["Physics", "Math", "Chemistry", "Biology"],
-    salary: "Negotiable",
-    additionalInfo: "Student: 1 (Class-9)",
-    timePosted: "28 August at 14:24",
-    status: "available",
-    likes: 8,
-    comments: 7,
-    likedBy: ["Chittra Chowdhury", "7 others"],
-    contactInfo: {
-      phone: "+880 1912-345680",
-      email: "suhel.akfzal@student.cuet.ac.bd"
-    }
-  },
-  {
-    id: 4,
-    poster: {
-      name: "Abdullah Zunaid",
-      avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      department: "Mechanical Engineering",
-      year: "3rd Year",
-      rating: 4.7,
-      completedTuitions: 12
-    },
-    title: "Female Tutor Needed",
-    description: "#booked",
-    studentLevel: "HSC 26 (English Version)",
-    location: "South Khulshi (Opposite of Basket)",
-    preferredTutor: "Experienced female tutor",
-    subjects: ["Math", "Physics"],
-    salary: "Negotiable",
-    additionalInfo: "Address: South Khulshi (Opposite of Basket)",
-    timePosted: "6 September at 12:07",
-    status: "booked",
-    likes: 3,
-    comments: 2,
-    likedBy: ["3 people"],
-    contactInfo: {
-      phone: "+880 1612-345681",
-      email: "abdullah.zunaid@student.cuet.ac.bd"
-    }
-  },
-  {
-    id: 5,
-    poster: {
-      name: "Fatima Rahman",
-      avatar: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      department: "Architecture",
-      year: "4th Year",
-      rating: 4.9,
-      completedTuitions: 28
-    },
-    title: "Math & English Tutor Required",
-    description: "Looking for dedicated tutor for SSC preparation",
-    studentLevel: "SSC candidate",
-    location: "Agrabad Commercial Area",
-    preferredTutor: "Any experienced tutor",
-    subjects: ["Mathematics", "English", "General Science"],
-    salary: "8,000-12,000 BDT/month",
-    additionalInfo: "5 days a week, 2 hours daily",
-    timePosted: "2 days ago",
-    status: "available",
-    likes: 12,
-    comments: 15,
-    likedBy: ["Ahmed Hassan", "14 others"],
-    contactInfo: {
-      phone: "+880 1712-345682",
-      email: "fatima.rahman@student.cuet.ac.bd"
-    }
-  },
-  {
-    id: 6,
-    poster: {
-      name: "Mohammad Ali Khan",
-      avatar: "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      department: "Chemical Engineering",
-      year: "3rd Year",
-      rating: 4.5,
-      completedTuitions: 18
-    },
-    title: "Chemistry & Physics Tutor Needed",
-    description: "University admission preparation required",
-    studentLevel: "HSC 2nd year",
-    location: "Nasirabad Housing",
-    preferredTutor: "Engineering student preferred",
-    subjects: ["Chemistry", "Physics", "Higher Math"],
-    salary: "Negotiable",
-    additionalInfo: "3 days per week, flexible timing",
-    timePosted: "1 day ago",
-    status: "available",
-    likes: 7,
-    comments: 9,
-    likedBy: ["Sarah Khan", "6 others"],
-    contactInfo: {
-      phone: "+880 1812-345683",
-      email: "mohammad.ali@student.cuet.ac.bd"
-    }
-  },
-  {
-    id: 7,
-    poster: {
-      name: "Rashida Begum",
-      avatar: "https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      department: "Economics",
-      year: "2nd Year",
-      rating: 4.4,
-      completedTuitions: 6
-    },
-    title: "Primary Level Tutor Required",
-    description: "Need caring tutor for young student",
-    studentLevel: "Class 5",
-    location: "Halishahar Housing Estate",
-    preferredTutor: "Female tutor only",
-    subjects: ["All subjects", "English", "Math", "Bangla"],
-    salary: "5,000-7,000 BDT/month",
-    additionalInfo: "Daily 1.5 hours, patient teacher needed",
-    timePosted: "3 hours ago",
-    status: "available",
-    likes: 5,
-    comments: 3,
-    likedBy: ["Fatima Rahman", "4 others"],
-    contactInfo: {
-      phone: "+880 1912-345684",
-      email: "rashida.begum@student.cuet.ac.bd"
-    }
-  },
-  {
-    id: 8,
-    poster: {
-      name: "Tanvir Ahmed",
-      avatar: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      department: "Petroleum & Mining Engineering",
-      year: "4th Year",
-      rating: 4.8,
-      completedTuitions: 25
-    },
-    title: "Advanced Math Tutor Available",
-    description: "Offering tutoring services for HSC students",
-    studentLevel: "HSC 1st & 2nd year",
-    location: "Chittagong University Area",
-    preferredTutor: "I am offering tutoring",
-    subjects: ["Higher Mathematics", "Physics", "Chemistry"],
-    salary: "10,000-15,000 BDT/month",
-    additionalInfo: "Proven track record, flexible schedule",
-    timePosted: "5 hours ago",
-    status: "offering",
-    likes: 18,
-    comments: 12,
-    likedBy: ["Abdullah Zunaid", "17 others"],
-    contactInfo: {
-      phone: "+880 1612-345685",
-      email: "tanvir.ahmed@student.cuet.ac.bd"
-    }
+    id: '3',
+    name: 'Fatima Khan',
+    department: 'Mathematics',
+    subjects: ['Calculus', 'Linear Algebra', 'Statistics'],
+    rating: 4.9,
+    reviews: 156,
+    hourlyRate: 700,
+    experience: '4 years',
+    bio: 'Mathematics graduate student with a passion for making complex concepts simple.',
+    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+    availability: ['Mon 10 AM-2 PM', 'Wed 1-5 PM', 'Fri 3-7 PM'],
+    location: 'CUET Campus'
   }
 ];
 
-const demoUsers = [
-  {
-    email: "ahmed.hassan@student.cuet.ac.bd",
-    password: "demo123",
-    name: "Ahmed Hassan",
-    department: "Computer Science & Engineering",
-    year: "3rd Year",
-    avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
-  },
-  {
-    email: "fatima.rahman@student.cuet.ac.bd",
-    password: "demo123",
-    name: "Fatima Rahman",
-    department: "Architecture",
-    year: "4th Year",
-    avatar: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
-  },
-  {
-    email: "mohammad.ali@student.cuet.ac.bd",
-    password: "demo123",
-    name: "Mohammad Ali Khan",
-    department: "Chemical Engineering",
-    year: "3rd Year",
-    avatar: "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
-  },
-  {
-    email: "sarah.khan@student.cuet.ac.bd",
-    password: "demo123",
-    name: "Sarah Khan",
-    department: "Civil Engineering",
-    year: "2nd Year",
-    avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
-  }
+const departments = [
+  'Computer Science & Engineering',
+  'Electrical & Electronic Engineering',
+  'Mechanical Engineering',
+  'Civil Engineering',
+  'Mathematics',
+  'Physics',
+  'Chemistry',
+  'Economics',
+  'English'
 ];
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('landing');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'find' | 'become' | 'dashboard'>('find');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
-  const [selectedLevel, setSelectedLevel] = useState('');
-  const [showContactModal, setShowContactModal] = useState(false);
-  const [selectedTuition, setSelectedTuition] = useState(null);
-  const [activeContactTab, setActiveContactTab] = useState('info');
-  const [message, setMessage] = useState('');
-  const [showPostModal, setShowPostModal] = useState(false);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Login function
-  const handleLogin = (email, password) => {
-    const user = demoUsers.find(u => u.email === email && u.password === password);
-    if (user) {
-      setCurrentUser(user);
-      setIsLoggedIn(true);
-      setCurrentPage('dashboard');
-      return true;
-    }
-    return false;
-  };
-
-  // Logout function
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    setCurrentPage('landing');
-  };
-
-  // Filter tuitions
-  const filteredTuitions = demoTuitions.filter(tuition => {
-    const matchesSearch = tuition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tuition.subjects.some(subject => subject.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                         tuition.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLocation = !selectedLocation || tuition.location.toLowerCase().includes(selectedLocation.toLowerCase());
-    const matchesSubject = !selectedSubject || tuition.subjects.some(subject => subject.toLowerCase().includes(selectedSubject.toLowerCase()));
-    const matchesLevel = !selectedLevel || tuition.studentLevel.toLowerCase().includes(selectedLevel.toLowerCase());
+  // Authentication persistence
+  useEffect(() => {
+    const savedUser = localStorage.getItem('cuet_tuition_user');
+    const loginTime = localStorage.getItem('cuet_tuition_login_time');
     
-    return matchesSearch && matchesLocation && matchesSubject && matchesLevel;
+    if (savedUser && loginTime) {
+      const timeDiff = Date.now() - parseInt(loginTime);
+      const dayInMs = 24 * 60 * 60 * 1000; // 24 hours
+      
+      // Keep user logged in for 30 days
+      if (timeDiff < 30 * dayInMs) {
+        setCurrentUser(JSON.parse(savedUser));
+      } else {
+        // Session expired, clear storage
+        localStorage.removeItem('cuet_tuition_user');
+        localStorage.removeItem('cuet_tuition_login_time');
+      }
+    }
+    
+    setIsLoading(false);
+  }, []);
+
+  const handleLogin = (email: string, password: string, role: 'student' | 'tutor') => {
+    // Simulate login - in real app, this would be an API call
+    const user: User = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      email,
+      role,
+      department: role === 'student' ? 'Computer Science & Engineering' : undefined,
+      year: role === 'student' ? 3 : undefined,
+      subjects: role === 'tutor' ? ['Programming', 'Data Structures'] : undefined,
+      rating: role === 'tutor' ? 4.8 : undefined,
+      hourlyRate: role === 'tutor' ? 800 : undefined,
+      bio: role === 'tutor' ? 'Experienced tutor passionate about teaching.' : undefined
+    };
+    
+    setCurrentUser(user);
+    
+    // Save to localStorage with timestamp
+    localStorage.setItem('cuet_tuition_user', JSON.stringify(user));
+    localStorage.setItem('cuet_tuition_login_time', Date.now().toString());
+    
+    setIsLoginOpen(false);
+    setActiveTab(role === 'student' ? 'find' : 'dashboard');
+  };
+
+  const handleSignup = (name: string, email: string, password: string, role: 'student' | 'tutor', department?: string, year?: number) => {
+    // Simulate signup - in real app, this would be an API call
+    const user: User = {
+      id: Math.random().toString(36).substr(2, 9),
+      name,
+      email,
+      role,
+      department: role === 'student' ? department : undefined,
+      year: role === 'student' ? year : undefined,
+      subjects: role === 'tutor' ? [] : undefined,
+      rating: role === 'tutor' ? 0 : undefined,
+      hourlyRate: role === 'tutor' ? 0 : undefined,
+      bio: role === 'tutor' ? '' : undefined
+    };
+    
+    setCurrentUser(user);
+    
+    // Save to localStorage with timestamp
+    localStorage.setItem('cuet_tuition_user', JSON.stringify(user));
+    localStorage.setItem('cuet_tuition_login_time', Date.now().toString());
+    
+    setIsSignupOpen(false);
+    setActiveTab(role === 'student' ? 'find' : 'dashboard');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('cuet_tuition_user');
+    localStorage.removeItem('cuet_tuition_login_time');
+    setActiveTab('find');
+  };
+
+  const filteredTutors = sampleTutors.filter(tutor => {
+    const matchesSearch = tutor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         tutor.subjects.some(subject => subject.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesDepartment = !selectedDepartment || tutor.department === selectedDepartment;
+    const matchesSubject = !selectedSubject || tutor.subjects.includes(selectedSubject);
+    const matchesPrice = tutor.hourlyRate >= priceRange[0] && tutor.hourlyRate <= priceRange[1];
+    
+    return matchesSearch && matchesDepartment && matchesSubject && matchesPrice;
   });
 
-  // Contact tutor function
-  const handleContactTutor = (tuition) => {
-    setSelectedTuition(tuition);
-    setShowContactModal(true);
-    setActiveContactTab('info');
-    setMessage('');
-  };
+  const allSubjects = Array.from(new Set(sampleTutors.flatMap(tutor => tutor.subjects)));
 
-  // Send message function
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      alert(`Message sent to ${selectedTuition.poster.name}:\n\n"${message}"`);
-      setMessage('');
-      setShowContactModal(false);
-    }
-  };
-
-  // Quick message templates
-  const quickMessages = [
-    "Hi! I'm interested in this tuition opportunity. Could we discuss the details?",
-    "Hello! I have experience teaching these subjects. When can we meet?",
-    "I'm available for this tuition. Please let me know your requirements.",
-    "Hi! I'd like to know more about the schedule and expectations."
-  ];
-
-  // Landing Page Component
-  const LandingPage = () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-blue-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-                  CUET Tuition Hub
-                </h1>
-                <p className="text-xs text-gray-500">Connect • Learn • Excel</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setCurrentPage('login')}
-              className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-2.5 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Get Started
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-green-600/5"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="text-center">
-            <div className="inline-flex items-center space-x-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <Building className="w-4 h-4" />
-              <span>Chittagong University of Engineering & Technology</span>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Your Gateway to
-              <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent block">
-                Academic Excellence
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Connect with experienced CUET student tutors, find the perfect learning match, 
-              and excel in your academic journey together.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => setCurrentPage('login')}
-                className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-              >
-                Find a Tutor
-              </button>
-              <button
-                onClick={() => setCurrentPage('login')}
-                className="bg-white text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-              >
-                Become a Tutor
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose CUET Tuition Hub?</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Built by CUET students, for CUET students. Experience the difference.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 hover:shadow-lg transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Verified CUET Students</h3>
-              <p className="text-gray-600 leading-relaxed">
-                All tutors are verified CUET students with proven academic excellence and teaching experience.
-              </p>
-            </div>
-            <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-green-50 to-green-100 hover:shadow-lg transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Search className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Smart Matching</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Advanced search and filtering to find the perfect tutor match for your specific needs.
-              </p>
-            </div>
-            <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 hover:shadow-lg transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <MessageCircle className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Direct Communication</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Connect directly with tutors through our secure messaging system and coordinate easily.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-green-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 text-center text-white">
-            <div>
-              <div className="text-4xl font-bold mb-2">500+</div>
-              <div className="text-blue-100">Active Tutors</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">1,200+</div>
-              <div className="text-blue-100">Students Helped</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">15+</div>
-              <div className="text-blue-100">Departments</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">98%</div>
-              <div className="text-blue-100">Success Rate</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold">CUET Tuition Hub</span>
-            </div>
-            <p className="text-gray-400 mb-4">
-              Empowering CUET students through collaborative learning
-            </p>
-            <p className="text-gray-500 text-sm">
-              © 2024 CUET Tuition Hub. Built with ❤️ by CUET students.
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-
-  // Login Page Component
-  const LoginPage = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      if (handleLogin(email, password)) {
-        setError('');
-      } else {
-        setError('Invalid email or password');
-      }
-    };
-
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <GraduationCap className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-              <p className="text-gray-600">Sign in to your CUET Tuition Hub account</p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  CUET Email Address
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="your.name@student.cuet.ac.bd"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
-              
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-              >
-                Sign In
-              </button>
-            </form>
-
-            <div className="mt-8 p-4 bg-blue-50 rounded-xl">
-              <p className="text-sm text-blue-800 font-medium mb-2">Demo Accounts:</p>
-              <div className="space-y-1 text-xs text-blue-700">
-                <p>📧 ahmed.hassan@student.cuet.ac.bd</p>
-                <p>🔑 demo123</p>
-              </div>
-            </div>
-
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => setCurrentPage('landing')}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                ← Back to Home
-              </button>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading CUET Tuition Hub...</p>
         </div>
       </div>
     );
-  };
+  }
 
-  // Post Tuition Modal Component
-  const PostTuitionModal = () => {
-    const [formData, setFormData] = useState({
-      title: '',
-      description: '',
-      studentLevel: '',
-      location: '',
-      subjects: [],
-      salary: '',
-      additionalInfo: '',
-      preferredTutor: ''
-    });
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      alert('Tuition posted successfully!');
-      setShowPostModal(false);
-      setFormData({
-        title: '',
-        description: '',
-        studentLevel: '',
-        location: '',
-        subjects: [],
-        salary: '',
-        additionalInfo: '',
-        preferredTutor: ''
-      });
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-bold text-gray-900">Post New Tuition</h3>
-              <button
-                onClick={() => setShowPostModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Title *
-              </label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., Math & Physics Tutor Needed"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                rows="3"
-                placeholder="Brief description of requirements..."
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Student Level *
-                </label>
-                <select
-                  value={formData.studentLevel}
-                  onChange={(e) => setFormData({...formData, studentLevel: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                >
-                  <option value="">Select Level</option>
-                  <option value="Class 1-5">Class 1-5</option>
-                  <option value="Class 6-8">Class 6-8</option>
-                  <option value="Class 9-10">Class 9-10</option>
-                  <option value="HSC 1st year">HSC 1st year</option>
-                  <option value="HSC 2nd year">HSC 2nd year</option>
-                  <option value="University Admission">University Admission</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Location *
-                </label>
-                <input
-                  type="text"
-                  value={formData.location}
-                  onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., Agrabad, Nasirabad"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Subjects *
-              </label>
-              <input
-                type="text"
-                value={formData.subjects.join(', ')}
-                onChange={(e) => setFormData({...formData, subjects: e.target.value.split(', ').filter(s => s.trim())})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., Math, Physics, Chemistry"
-                required
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Salary
-                </label>
-                <input
-                  type="text"
-                  value={formData.salary}
-                  onChange={(e) => setFormData({...formData, salary: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., 8,000-12,000 BDT/month"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Preferred Tutor
-                </label>
-                <select
-                  value={formData.preferredTutor}
-                  onChange={(e) => setFormData({...formData, preferredTutor: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">No preference</option>
-                  <option value="Male tutor preferred">Male tutor preferred</option>
-                  <option value="Female tutor preferred">Female tutor preferred</option>
-                  <option value="Engineering student preferred">Engineering student preferred</option>
-                  <option value="Senior student preferred">Senior student preferred</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Additional Information
-              </label>
-              <textarea
-                value={formData.additionalInfo}
-                onChange={(e) => setFormData({...formData, additionalInfo: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                rows="3"
-                placeholder="Schedule, special requirements, etc..."
-              />
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setShowPostModal(false)}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-200"
-              >
-                Post Tuition
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
-
-  // Contact Modal Component
-  const ContactModal = () => (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-bold text-gray-900">Contact Tutor</h3>
-            <button
-              onClick={() => setShowContactModal(false)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="flex space-x-1 mt-4">
-            <button
-              onClick={() => setActiveContactTab('info')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                activeContactTab === 'info'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              Tutor Info
-            </button>
-            <button
-              onClick={() => setActiveContactTab('message')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                activeContactTab === 'message'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              Send Message
-            </button>
-          </div>
-        </div>
-
-        <div className="p-6 max-h-[60vh] overflow-y-auto">
-          {activeContactTab === 'info' && selectedTuition && (
-            <div className="space-y-6">
-              {/* Tutor Profile */}
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-                <img
-                  src={selectedTuition.poster.avatar}
-                  alt={selectedTuition.poster.name}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <div className="flex-1">
-                  <h4 className="text-xl font-bold text-gray-900">{selectedTuition.poster.name}</h4>
-                  <p className="text-gray-600">{selectedTuition.poster.department}</p>
-                  <p className="text-sm text-gray-500">{selectedTuition.poster.year}</p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm font-medium ml-1">{selectedTuition.poster.rating}</span>
-                    </div>
-                    <span className="text-gray-300">•</span>
-                    <span className="text-sm text-gray-600">{selectedTuition.poster.completedTuitions} completed</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tuition Details */}
-              <div className="space-y-4">
-                <div>
-                  <h5 className="font-semibold text-gray-900 mb-2">Tuition Details</h5>
-                  <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <BookOpen className="w-5 h-5 text-blue-600" />
-                      <div>
-                        <span className="font-medium">Subjects:</span>
-                        <span className="ml-2 text-gray-700">{selectedTuition.subjects.join(', ')}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <GraduationCap className="w-5 h-5 text-green-600" />
-                      <div>
-                        <span className="font-medium">Student Level:</span>
-                        <span className="ml-2 text-gray-700">{selectedTuition.studentLevel}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="w-5 h-5 text-red-600" />
-                      <div>
-                        <span className="font-medium">Location:</span>
-                        <span className="ml-2 text-gray-700">{selectedTuition.location}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <DollarSign className="w-5 h-5 text-purple-600" />
-                      <div>
-                        <span className="font-medium">Salary:</span>
-                        <span className="ml-2 text-gray-700">{selectedTuition.salary}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Requirements */}
-                <div>
-                  <h5 className="font-semibold text-gray-900 mb-2">Requirements</h5>
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                    <p className="text-amber-800">{selectedTuition.preferredTutor}</p>
-                    {selectedTuition.additionalInfo && (
-                      <p className="text-amber-700 mt-2">{selectedTuition.additionalInfo}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Contact Options */}
-                <div className="flex space-x-3">
-                  <button className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
-                    <MessageCircle className="w-5 h-5" />
-                    <span>Message</span>
-                  </button>
-                  <button className="flex-1 bg-green-600 text-white py-3 rounded-xl font-medium hover:bg-green-700 transition-colors flex items-center justify-center space-x-2">
-                    <Phone className="w-5 h-5" />
-                    <span>Call</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeContactTab === 'message' && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <img
-                  src={selectedTuition?.poster.avatar}
-                  alt={selectedTuition?.poster.name}
-                  className="w-16 h-16 rounded-full object-cover mx-auto mb-3"
-                />
-                <h4 className="text-lg font-bold text-gray-900">{selectedTuition?.poster.name}</h4>
-                <p className="text-gray-600">{selectedTuition?.poster.department}</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Message
-                </label>
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows="4"
-                  placeholder="Type your message here..."
-                />
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-gray-700 mb-3">Quick Templates:</p>
-                <div className="space-y-2">
-                  {quickMessages.map((template, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setMessage(template)}
-                      className="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm text-gray-700 transition-colors"
-                    >
-                      {template}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                onClick={handleSendMessage}
-                disabled={!message.trim()}
-                className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              >
-                <Send className="w-5 h-5" />
-                <span>Send Message</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  // Tuition Card Component
-  const TuitionCard = ({ tuition }) => (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <img
-            src={tuition.poster.avatar}
-            alt={tuition.poster.name}
-            className="w-12 h-12 rounded-full object-cover"
-          />
-          <div>
-            <h3 className="font-bold text-gray-900">{tuition.poster.name}</h3>
-            <p className="text-sm text-gray-600">{tuition.poster.department}</p>
-            <p className="text-xs text-gray-500">{tuition.timePosted}</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          {tuition.status === 'booked' && (
-            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
-              #booked
-            </span>
-          )}
-          {tuition.status === 'offering' && (
-            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
-              Offering
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="space-y-3 mb-4">
-        <h4 className="text-lg font-bold text-gray-900">{tuition.title}</h4>
-        {tuition.description && (
-          <p className="text-gray-700">{tuition.description}</p>
-        )}
-        
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <GraduationCap className="w-4 h-4" />
-            <span>Student: {tuition.studentLevel}</span>
-          </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <MapPin className="w-4 h-4" />
-            <span>Location: {tuition.location}</span>
-          </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <BookOpen className="w-4 h-4" />
-            <span>Subjects: {tuition.subjects.join(', ')}</span>
-          </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <DollarSign className="w-4 h-4" />
-            <span>Salary: {tuition.salary}</span>
-          </div>
-          {tuition.preferredTutor && (
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <User className="w-4 h-4" />
-              <span>{tuition.preferredTutor}</span>
-            </div>
-          )}
-          {tuition.additionalInfo && (
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <AlertCircle className="w-4 h-4" />
-              <span>{tuition.additionalInfo}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-        <div className="flex items-center space-x-4">
-          <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition-colors">
-            <ThumbsUp className="w-4 h-4" />
-            <span className="text-sm">{tuition.likes}</span>
-          </button>
-          <button className="flex items-center space-x-1 text-gray-600 hover:text-green-600 transition-colors">
-            <MessageCircle className="w-4 h-4" />
-            <span className="text-sm">{tuition.comments}</span>
-          </button>
-          <span className="text-xs text-gray-500">{tuition.likedBy[0]}</span>
-        </div>
-        
-        {tuition.status !== 'booked' && (
-          <button
-            onClick={() => handleContactTutor(tuition)}
-            className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200 flex items-center space-x-2"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span>Contact</span>
-          </button>
-        )}
-      </div>
-    </div>
-  );
-
-  // Dashboard Component
-  const Dashboard = () => (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white" />
+              <div className="bg-indigo-600 p-2 rounded-lg">
+                <BookOpen className="h-6 w-6 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">CUET Tuition Hub</h1>
                 <p className="text-xs text-gray-500">Connect • Learn • Excel</p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-4">
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
               <button
-                onClick={() => setShowPostModal(true)}
-                className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200 flex items-center space-x-2"
+                onClick={() => setActiveTab('find')}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'find' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
+                }`}
               >
-                <Plus className="w-4 h-4" />
-                <span>Post Tuition</span>
+                Find Tutors
               </button>
-              
-              <div className="flex items-center space-x-3">
-                <img
-                  src={currentUser?.avatar}
-                  alt={currentUser?.name}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <div className="hidden md:block">
-                  <p className="text-sm font-medium text-gray-900">{currentUser?.name}</p>
-                  <p className="text-xs text-gray-500">{currentUser?.department}</p>
-                </div>
+              <button
+                onClick={() => setActiveTab('become')}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'become' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
+                }`}
+              >
+                Become a Tutor
+              </button>
+              {currentUser && (
                 <button
-                  onClick={handleLogout}
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === 'dashboard' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
+                  }`}
                 >
-                  <Settings className="w-5 h-5" />
+                  Dashboard
                 </button>
-              </div>
+              )}
+            </nav>
+
+            {/* User Menu */}
+            <div className="flex items-center space-x-4">
+              {currentUser ? (
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="hidden sm:block">
+                      <p className="text-sm font-medium text-gray-900">{currentUser.name}</p>
+                      <p className="text-xs text-gray-500 capitalize">{currentUser.role}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    title="Logout"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => setIsLoginOpen(true)}
+                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => setIsSignupOpen(true)}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
+
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              >
+                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-200">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <button
+                onClick={() => {
+                  setActiveTab('find');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left ${
+                  activeTab === 'find' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
+                }`}
+              >
+                Find Tutors
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('become');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left ${
+                  activeTab === 'become' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
+                }`}
+              >
+                Become a Tutor
+              </button>
+              {currentUser && (
+                <button
+                  onClick={() => {
+                    setActiveTab('dashboard');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left ${
+                    activeTab === 'dashboard' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
+                  }`}
+                >
+                  Dashboard
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Filters</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Search
-                  </label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Search tuitions..."
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Location
-                  </label>
-                  <select
-                    value={selectedLocation}
-                    onChange={(e) => setSelectedLocation(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">All Locations</option>
-                    <option value="Agrabad">Agrabad</option>
-                    <option value="Nasirabad">Nasirabad</option>
-                    <option value="Halishahar">Halishahar</option>
-                    <option value="Andarkilla">Andarkilla</option>
-                    <option value="Khulshi">Khulshi</option>
-                    <option value="Chandgaon">Chandgaon</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Subject
-                  </label>
-                  <select
-                    value={selectedSubject}
-                    onChange={(e) => setSelectedSubject(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">All Subjects</option>
-                    <option value="Math">Mathematics</option>
-                    <option value="Physics">Physics</option>
-                    <option value="Chemistry">Chemistry</option>
-                    <option value="Biology">Biology</option>
-                    <option value="English">English</option>
-                    <option value="Bangla">Bangla</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Student Level
-                  </label>
-                  <select
-                    value={selectedLevel}
-                    onChange={(e) => setSelectedLevel(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">All Levels</option>
-                    <option value="Class">Primary (Class 1-5)</option>
-                    <option value="Class">Secondary (Class 6-10)</option>
-                    <option value="HSC">Higher Secondary (HSC)</option>
-                    <option value="Admission">University Admission</option>
-                  </select>
-                </div>
-
-                <button className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors">
-                  Clear Filters
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Feed */}
-          <div className="lg:col-span-3">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Available Tuitions</h2>
-              <p className="text-gray-600">
-                {filteredTuitions.length} tuition{filteredTuitions.length !== 1 ? 's' : ''} found
+        {activeTab === 'find' && (
+          <div className="space-y-8">
+            {/* Hero Section */}
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl font-bold text-gray-900">Find Your Perfect Tutor</h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Connect with experienced CUET students and alumni who can help you excel in your studies
               </p>
             </div>
 
-            <div className="space-y-6">
-              {filteredTuitions.map((tuition) => (
-                <TuitionCard key={tuition.id} tuition={tuition} />
+            {/* Search and Filters */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    type="text"
+                    placeholder="Search by tutor name or subject..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <button className="lg:w-auto w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2">
+                  <Filter className="h-5 w-5" />
+                  <span>Search</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <select
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="">All Departments</option>
+                  {departments.map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedSubject}
+                  onChange={(e) => setSelectedSubject(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="">All Subjects</option>
+                  {allSubjects.map(subject => (
+                    <option key={subject} value={subject}>{subject}</option>
+                  ))}
+                </select>
+
+                <div className="flex items-center space-x-2">
+                  <DollarSign className="h-5 w-5 text-gray-400" />
+                  <input
+                    type="range"
+                    min="0"
+                    max="2000"
+                    step="50"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-gray-600">৳{priceRange[1]}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tutors Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredTutors.map((tutor) => (
+                <div key={tutor.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+                  <div className="flex items-start space-x-4 mb-4">
+                    <img
+                      src={tutor.avatar}
+                      alt={tutor.name}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{tutor.name}</h3>
+                      <p className="text-sm text-gray-600">{tutor.department}</p>
+                      <div className="flex items-center space-x-1 mt-1">
+                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                        <span className="text-sm font-medium">{tutor.rating}</span>
+                        <span className="text-sm text-gray-500">({tutor.reviews} reviews)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 mb-1">Subjects:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {tutor.subjects.map((subject, index) => (
+                          <span key={index} className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">
+                            {subject}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                      <div className="flex items-center space-x-1">
+                        <MapPin className="h-4 w-4" />
+                        <span>{tutor.location}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{tutor.experience}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="text-lg font-bold text-indigo-600">
+                        ৳{tutor.hourlyRate}/hour
+                      </div>
+                      <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-1">
+                        <MessageCircle className="h-4 w-4" />
+                        <span>Contact</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
 
-            {filteredTuitions.length === 0 && (
+            {filteredTutors.length === 0 && (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-8 h-8 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No tuitions found</h3>
-                <p className="text-gray-600">Try adjusting your search criteria or post a new tuition request.</p>
+                <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No tutors found</h3>
+                <p className="text-gray-600">Try adjusting your search criteria to find more tutors.</p>
               </div>
             )}
           </div>
-        </div>
+        )}
+
+        {activeTab === 'become' && (
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl font-bold text-gray-900">Become a Tutor</h2>
+              <p className="text-xl text-gray-600">
+                Share your knowledge, help fellow students, and earn money while making a difference
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              <div className="text-center space-y-4">
+                <div className="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                  <GraduationCap className="h-8 w-8 text-indigo-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Share Knowledge</h3>
+                <p className="text-gray-600">Help fellow CUET students succeed in their academic journey</p>
+              </div>
+              <div className="text-center space-y-4">
+                <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                  <DollarSign className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Earn Money</h3>
+                <p className="text-gray-600">Set your own rates and work on your own schedule</p>
+              </div>
+              <div className="text-center space-y-4">
+                <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                  <Heart className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Make Impact</h3>
+                <p className="text-gray-600">Build meaningful connections and contribute to the community</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Ready to get started?</h3>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-gray-900">Requirements:</h4>
+                    <ul className="space-y-2 text-gray-600">
+                      <li className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                        <span>Current CUET student or recent graduate</span>
+                      </li>
+                      <li className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                        <span>Strong academic performance in your subjects</span>
+                      </li>
+                      <li className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                        <span>Passion for teaching and helping others</span>
+                      </li>
+                      <li className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                        <span>Good communication skills</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-gray-900">Benefits:</h4>
+                    <ul className="space-y-2 text-gray-600">
+                      <li className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                        <span>Flexible scheduling</span>
+                      </li>
+                      <li className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                        <span>Competitive hourly rates (৳500-2000/hour)</span>
+                      </li>
+                      <li className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                        <span>Build your teaching portfolio</span>
+                      </li>
+                      <li className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                        <span>Connect with fellow students</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <button
+                    onClick={() => setIsSignupOpen(true)}
+                    className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition-colors inline-flex items-center space-x-2"
+                  >
+                    <span>Join as a Tutor</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'dashboard' && currentUser && (
+          <div className="space-y-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">Welcome back, {currentUser.name}!</h2>
+                <p className="text-gray-600 capitalize">Your {currentUser.role} dashboard</p>
+              </div>
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center">
+                    <User className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{currentUser.name}</p>
+                    <p className="text-sm text-gray-500">{currentUser.email}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {currentUser.role === 'student' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <BookOpen className="h-8 w-8 text-indigo-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">My Sessions</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-900 mb-2">12</p>
+                  <p className="text-sm text-gray-600">Total sessions completed</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Users className="h-8 w-8 text-green-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">Active Tutors</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-900 mb-2">3</p>
+                  <p className="text-sm text-gray-600">Currently learning from</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Star className="h-8 w-8 text-yellow-500" />
+                    <h3 className="text-lg font-semibold text-gray-900">Average Rating</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-900 mb-2">4.8</p>
+                  <p className="text-sm text-gray-600">From your tutors</p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Users className="h-8 w-8 text-indigo-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">Students</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-900 mb-2">24</p>
+                  <p className="text-sm text-gray-600">Total students taught</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Clock className="h-8 w-8 text-green-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">Hours</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-900 mb-2">156</p>
+                  <p className="text-sm text-gray-600">Total teaching hours</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Star className="h-8 w-8 text-yellow-500" />
+                    <h3 className="text-lg font-semibold text-gray-900">Rating</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-900 mb-2">{currentUser.rating || 4.9}</p>
+                  <p className="text-sm text-gray-600">Average from students</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <DollarSign className="h-8 w-8 text-purple-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">Earnings</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-gray-900 mb-2">৳45,600</p>
+                  <p className="text-sm text-gray-600">Total earned</p>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h3>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <MessageCircle className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">New message from Sarah Ahmed</p>
+                    <p className="text-sm text-gray-600">2 hours ago</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <BookOpen className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">Session completed with Rafiq Hassan</p>
+                    <p className="text-sm text-gray-600">1 day ago</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <Star className="h-5 w-5 text-yellow-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">Received 5-star rating</p>
+                    <p className="text-sm text-gray-600">3 days ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
-      {/* Modals */}
-      {showContactModal && <ContactModal />}
-      {showPostModal && <PostTuitionModal />}
+      {/* Login Modal */}
+      {isLoginOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
+              <button
+                onClick={() => setIsLoginOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              handleLogin(
+                formData.get('email') as string,
+                formData.get('password') as string,
+                formData.get('role') as 'student' | 'tutor'
+              );
+            }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="your.email@cuet.ac.bd"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Enter your password"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">I am a:</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input type="radio" name="role" value="student" defaultChecked className="text-indigo-600" />
+                    <span>Student</span>
+                  </label>
+                  <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input type="radio" name="role" value="tutor" className="text-indigo-600" />
+                    <span>Tutor</span>
+                  </label>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+              >
+                Sign In
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-gray-600">
+                Don't have an account?{' '}
+                <button
+                  onClick={() => {
+                    setIsLoginOpen(false);
+                    setIsSignupOpen(true);
+                  }}
+                  className="text-indigo-600 hover:text-indigo-700 font-medium"
+                >
+                  Sign up
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Signup Modal */}
+      {isSignupOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Join CUET Tuition Hub</h2>
+              <button
+                onClick={() => setIsSignupOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              handleSignup(
+                formData.get('name') as string,
+                formData.get('email') as string,
+                formData.get('password') as string,
+                formData.get('role') as 'student' | 'tutor',
+                formData.get('department') as string,
+                parseInt(formData.get('year') as string)
+              );
+            }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Your full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="your.email@cuet.ac.bd"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Create a strong password"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">I am a:</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input type="radio" name="role" value="student" defaultChecked className="text-indigo-600" />
+                    <span>Student</span>
+                  </label>
+                  <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input type="radio" name="role" value="tutor" className="text-indigo-600" />
+                    <span>Tutor</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                <select
+                  name="department"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="">Select your department</option>
+                  {departments.map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Year of Study</label>
+                <select
+                  name="year"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="">Select year</option>
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                  <option value="5">Graduate</option>
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+              >
+                Create Account
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-gray-600">
+                Already have an account?{' '}
+                <button
+                  onClick={() => {
+                    setIsSignupOpen(false);
+                    setIsLoginOpen(true);
+                  }}
+                  className="text-indigo-600 hover:text-indigo-700 font-medium"
+                >
+                  Sign in
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-
-  // Main App Render
-  if (currentPage === 'landing') {
-    return <LandingPage />;
-  } else if (currentPage === 'login') {
-    return <LoginPage />;
-  } else if (currentPage === 'dashboard' && isLoggedIn) {
-    return <Dashboard />;
-  }
-
-  return <LandingPage />;
 }
 
 export default App;
