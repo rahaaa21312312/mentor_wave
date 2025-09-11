@@ -302,6 +302,8 @@ function App() {
   const [activeContactTab, setActiveContactTab] = useState('info');
   const [message, setMessage] = useState('');
   const [showPostModal, setShowPostModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [registerType, setRegisterType] = useState('tutor');
 
   // Login function
   const handleLogin = (email, password) => {
@@ -320,6 +322,13 @@ function App() {
     setIsLoggedIn(false);
     setCurrentUser(null);
     setCurrentPage('landing');
+  };
+
+  const handleRegister = (formData) => {
+    // In a real app, this would make an API call to register the user
+    console.log('Registration data:', { ...formData, type: registerType });
+    alert(`Registration successful! Welcome to Mentor Wave CUET as a ${registerType}.`);
+    setShowRegisterModal(false);
   };
 
   // Filter tuitions
@@ -372,17 +381,37 @@ function App() {
               </div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-                  CUET Tuition Hub
+                  Mentor Wave CUET
                 </h1>
                 <p className="text-xs text-gray-500">Connect • Learn • Excel</p>
               </div>
             </div>
-            <button
-              onClick={() => setCurrentPage('login')}
-              className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-2.5 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Get Started
-            </button>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setCurrentPage('login')}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => {
+                  setRegisterType('tutor');
+                  setShowRegisterModal(true);
+                }}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Register as Tutor
+              </button>
+              <button
+                onClick={() => {
+                  setRegisterType('guardian');
+                  setShowRegisterModal(true);
+                }}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Register as Guardian
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -397,27 +426,29 @@ function App() {
               <span>Chittagong University of Engineering & Technology</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Your Gateway to
-              <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent block">
-                Academic Excellence
-              </span>
+              Welcome to Mentor Wave CUET
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Connect with experienced CUET student tutors, find the perfect learning match, 
-              and excel in your academic journey together.
+              Connect with experienced tutors, find the perfect learning partner, and excel in your academic journey. Join the premier tutoring community for CUET students and guardians.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => setCurrentPage('login')}
-                className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                onClick={() => {
+                  setRegisterType('tutor');
+                  setShowRegisterModal(true);
+                }}
+                className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
               >
-                Find a Tutor
+                Join as Tutor
               </button>
               <button
-                onClick={() => setCurrentPage('login')}
-                className="bg-white text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                onClick={() => {
+                  setRegisterType('guardian');
+                  setShowRegisterModal(true);
+                }}
+                className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold"
               >
-                Become a Tutor
+                Join as Guardian
               </button>
             </div>
           </div>
@@ -508,6 +539,15 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* Registration Modal */}
+      {showRegisterModal && (
+        <RegistrationModal 
+          type={registerType}
+          onClose={() => setShowRegisterModal(false)} 
+          onSubmit={handleRegister} 
+        />
+      )}
     </div>
   );
 
@@ -1235,6 +1275,382 @@ function App() {
       {showPostModal && <PostTuitionModal />}
     </div>
   );
+
+  // Registration Modal Component
+  const RegistrationModal = ({ type, onClose, onSubmit }) => {
+    const [formData, setFormData] = useState({
+      fullName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phone: '',
+      department: '',
+      studentId: '',
+      year: '',
+      location: '',
+      subjects: '',
+      experience: '',
+      qualification: '',
+      preferredAreas: '',
+      childAge: '',
+      childClass: '',
+      requirements: ''
+    });
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      if (formData.password !== formData.confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+      }
+      onSubmit(formData);
+    };
+
+    const handleChange = (e) => {
+      setFormData(prev => ({
+        ...prev,
+        [e.target.name]: e.target.value
+      }));
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Register as {type === 'tutor' ? 'Tutor' : 'Guardian'}
+              </h2>
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <p className="text-gray-600 mt-2">
+              {type === 'tutor' 
+                ? 'Join as a tutor to share your knowledge and help students excel'
+                : 'Register to find the perfect tutor for your child'
+              }
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="your.email@student.cuet.ac.bd"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password *
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Create a strong password"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirm Password *
+                </label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Confirm your password"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="+880 1XXX-XXXXXX"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Location *
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="e.g., Andarkilla, Chittagong"
+                />
+              </div>
+            </div>
+
+            {/* Tutor-specific fields */}
+            {type === 'tutor' && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Department *
+                    </label>
+                    <select
+                      name="department"
+                      value={formData.department}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      <option value="">Select Department</option>
+                      <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                      <option value="Electrical & Electronic Engineering">Electrical & Electronic Engineering</option>
+                      <option value="Mechanical Engineering">Mechanical Engineering</option>
+                      <option value="Civil Engineering">Civil Engineering</option>
+                      <option value="Architecture">Architecture</option>
+                      <option value="Mathematics">Mathematics</option>
+                      <option value="Physics">Physics</option>
+                      <option value="Chemistry">Chemistry</option>
+                      <option value="Economics">Economics</option>
+                      <option value="Business Administration">Business Administration</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Student ID *
+                    </label>
+                    <input
+                      type="text"
+                      name="studentId"
+                      value={formData.studentId}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 1904XXX"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Current Year *
+                    </label>
+                    <select
+                      name="year"
+                      value={formData.year}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      <option value="">Select Year</option>
+                      <option value="1st Year">1st Year</option>
+                      <option value="2nd Year">2nd Year</option>
+                      <option value="3rd Year">3rd Year</option>
+                      <option value="4th Year">4th Year</option>
+                      <option value="Graduate">Graduate</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Teaching Experience
+                    </label>
+                    <input
+                      type="text"
+                      name="experience"
+                      value={formData.experience}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 2 years"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subjects You Can Teach *
+                  </label>
+                  <input
+                    type="text"
+                    name="subjects"
+                    value={formData.subjects}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="e.g., Mathematics, Physics, Chemistry"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Qualifications & Achievements
+                  </label>
+                  <textarea
+                    name="qualification"
+                    value={formData.qualification}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Describe your academic achievements, certifications, etc."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Preferred Teaching Areas
+                  </label>
+                  <input
+                    type="text"
+                    name="preferredAreas"
+                    value={formData.preferredAreas}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="e.g., Andarkilla, Khulshi, GEC More"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Guardian-specific fields */}
+            {type === 'guardian' && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Child's Age
+                    </label>
+                    <input
+                      type="number"
+                      name="childAge"
+                      value={formData.childAge}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 16"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Child's Class/Level *
+                    </label>
+                    <select
+                      name="childClass"
+                      value={formData.childClass}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      <option value="">Select Class/Level</option>
+                      <option value="Class 6">Class 6</option>
+                      <option value="Class 7">Class 7</option>
+                      <option value="Class 8">Class 8</option>
+                      <option value="Class 9">Class 9</option>
+                      <option value="Class 10">Class 10</option>
+                      <option value="HSC 1st Year">HSC 1st Year</option>
+                      <option value="HSC 2nd Year">HSC 2nd Year</option>
+                      <option value="University Admission">University Admission</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Required Subjects *
+                  </label>
+                  <input
+                    type="text"
+                    name="subjects"
+                    value={formData.subjects}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="e.g., Mathematics, Physics, Chemistry"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Special Requirements
+                  </label>
+                  <textarea
+                    name="requirements"
+                    value={formData.requirements}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Any specific requirements for the tutor (gender preference, experience level, etc.)"
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors ${
+                  type === 'tutor' 
+                    ? 'bg-green-600 hover:bg-green-700' 
+                    : 'bg-purple-600 hover:bg-purple-700'
+                }`}
+              >
+                Register as {type === 'tutor' ? 'Tutor' : 'Guardian'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
 
   // Main App Render
   if (currentPage === 'landing') {
