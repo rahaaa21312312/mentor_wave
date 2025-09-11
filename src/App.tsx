@@ -1,917 +1,1030 @@
-import React, { useState, useEffect } from 'react';
-import { BookOpen, Users, Star, ArrowRight, Menu, X, User, LogOut, Search, Filter, MapPin, Clock, DollarSign, GraduationCap, MessageCircle, Heart } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, BookOpen, MapPin, Clock, DollarSign, Star, Search, Filter, Plus, Menu, X, Home, Users, Settings, LogOut } from 'lucide-react';
 
-// Types
-interface User {
+interface Tuition {
+  id: string;
+  title: string;
+  subject: string;
+  level: string;
+  location: string;
+  schedule: string;
+  fee: string;
+  tutor: {
+    name: string;
+    department: string;
+    year: string;
+    rating: number;
+    avatar: string;
+  };
+  description: string;
+  requirements: string[];
+  postedDate: string;
+}
+
+interface TutorProfile {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'tutor';
-  department?: string;
-  year?: number;
-  subjects?: string[];
-  rating?: number;
-  hourlyRate?: number;
-  bio?: string;
-  avatar?: string;
-}
-
-interface Tutor {
-  id: string;
-  name: string;
   department: string;
-  subjects: string[];
-  rating: number;
-  reviews: number;
-  hourlyRate: number;
-  experience: string;
-  bio: string;
+  year: string;
   avatar: string;
-  availability: string[];
-  location: string;
+  rating: number;
+  totalStudents: number;
+  subjects: string[];
+  bio: string;
 }
 
-// Sample data
-const sampleTutors: Tutor[] = [
+const mockTuitions: Tuition[] = [
   {
     id: '1',
-    name: 'Sarah Ahmed',
-    department: 'Computer Science & Engineering',
-    subjects: ['Data Structures', 'Algorithms', 'Programming'],
-    rating: 4.9,
-    reviews: 127,
-    hourlyRate: 800,
-    experience: '3 years',
-    bio: 'Final year CSE student with expertise in competitive programming and software development.',
-    avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-    availability: ['Mon 2-6 PM', 'Wed 3-7 PM', 'Fri 1-5 PM'],
-    location: 'CUET Campus'
+    title: 'Advanced Mathematics Tutoring',
+    subject: 'Mathematics',
+    level: 'HSC',
+    location: 'Chittagong',
+    schedule: 'Mon, Wed, Fri - 7:00 PM',
+    fee: '3000 BDT/month',
+    tutor: {
+      name: 'Ahmed Hassan',
+      department: 'CSE',
+      year: '4th Year',
+      rating: 4.8,
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+    },
+    description: 'Comprehensive mathematics tutoring for HSC students focusing on calculus, algebra, and geometry.',
+    requirements: ['HSC level student', 'Basic calculator', 'Notebook'],
+    postedDate: '2 days ago'
   },
   {
     id: '2',
-    name: 'Rafiq Hassan',
-    department: 'Electrical & Electronic Engineering',
-    subjects: ['Circuit Analysis', 'Electronics', 'Control Systems'],
-    rating: 4.8,
-    reviews: 89,
-    hourlyRate: 750,
-    experience: '2 years',
-    bio: 'EEE student passionate about electronics and helping others understand complex circuits.',
-    avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-    availability: ['Tue 4-8 PM', 'Thu 2-6 PM', 'Sat 10 AM-2 PM'],
-    location: 'CUET Campus'
+    title: 'Physics Problem Solving',
+    subject: 'Physics',
+    level: 'HSC',
+    location: 'Online/Chittagong',
+    schedule: 'Tue, Thu, Sat - 6:00 PM',
+    fee: '2500 BDT/month',
+    tutor: {
+      name: 'Fatima Rahman',
+      department: 'EEE',
+      year: '3rd Year',
+      rating: 4.9,
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b829?w=150&h=150&fit=crop&crop=face'
+    },
+    description: 'Expert physics tutoring with focus on mechanics, thermodynamics, and electromagnetism.',
+    requirements: ['HSC Physics book', 'Graph paper', 'Scientific calculator'],
+    postedDate: '1 week ago'
   },
   {
     id: '3',
-    name: 'Fatima Khan',
-    department: 'Mathematics',
-    subjects: ['Calculus', 'Linear Algebra', 'Statistics'],
-    rating: 4.9,
-    reviews: 156,
-    hourlyRate: 700,
-    experience: '4 years',
-    bio: 'Mathematics graduate student with a passion for making complex concepts simple.',
-    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-    availability: ['Mon 10 AM-2 PM', 'Wed 1-5 PM', 'Fri 3-7 PM'],
-    location: 'CUET Campus'
+    title: 'Chemistry Lab Techniques',
+    subject: 'Chemistry',
+    level: 'HSC',
+    location: 'CUET Campus',
+    schedule: 'Weekend - 10:00 AM',
+    fee: '4000 BDT/month',
+    tutor: {
+      name: 'Mohammad Ali',
+      department: 'ChE',
+      year: '4th Year',
+      rating: 4.7,
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+    },
+    description: 'Hands-on chemistry tutoring with laboratory techniques and theoretical concepts.',
+    requirements: ['Chemistry textbook', 'Lab notebook', 'Safety goggles'],
+    postedDate: '3 days ago'
+  },
+  {
+    id: '4',
+    title: 'English Literature & Communication',
+    subject: 'English',
+    level: 'HSC',
+    location: 'Online',
+    schedule: 'Daily - 8:00 PM',
+    fee: '2000 BDT/month',
+    tutor: {
+      name: 'Sarah Khan',
+      department: 'CE',
+      year: '2nd Year',
+      rating: 4.6,
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+    },
+    description: 'Improve your English skills with literature analysis and communication techniques.',
+    requirements: ['English textbook', 'Good internet connection', 'Microphone'],
+    postedDate: '5 days ago'
   }
 ];
 
-const departments = [
-  'Computer Science & Engineering',
-  'Electrical & Electronic Engineering',
-  'Mechanical Engineering',
-  'Civil Engineering',
-  'Mathematics',
-  'Physics',
-  'Chemistry',
-  'Economics',
-  'English'
-];
+const mockUser: TutorProfile = {
+  id: '1',
+  name: 'Ahmed Hassan',
+  email: 'ahmed.hassan@student.cuet.ac.bd',
+  department: 'Computer Science & Engineering',
+  year: '4th Year',
+  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+  rating: 4.8,
+  totalStudents: 25,
+  subjects: ['Mathematics', 'Programming', 'Data Structures'],
+  bio: 'Passionate about teaching and helping fellow students excel in their academic journey.'
+};
 
 function App() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'landing' | 'login' | 'register' | 'dashboard' | 'post-tuition' | 'profile'>('landing');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<TutorProfile | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('All');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'find' | 'become' | 'dashboard'>('find');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Authentication persistence
-  useEffect(() => {
-    const savedUser = localStorage.getItem('cuet_tuition_user');
-    const loginTime = localStorage.getItem('cuet_tuition_login_time');
-    
-    if (savedUser && loginTime) {
-      const timeDiff = Date.now() - parseInt(loginTime);
-      const dayInMs = 24 * 60 * 60 * 1000; // 24 hours
-      
-      // Keep user logged in for 30 days
-      if (timeDiff < 30 * dayInMs) {
-        setCurrentUser(JSON.parse(savedUser));
-      } else {
-        // Session expired, clear storage
-        localStorage.removeItem('cuet_tuition_user');
-        localStorage.removeItem('cuet_tuition_login_time');
-      }
+  // Demo login credentials
+  const demoCredentials = [
+    { email: 'ahmed.hassan@student.cuet.ac.bd', password: 'demo123' },
+    { email: 'fatima.rahman@student.cuet.ac.bd', password: 'demo123' },
+    { email: 'mohammad.ali@student.cuet.ac.bd', password: 'demo123' },
+    { email: 'sarah.khan@student.cuet.ac.bd', password: 'demo123' }
+  ];
+
+  const handleLogin = (email: string, password: string) => {
+    const validCredential = demoCredentials.find(cred => cred.email === email && cred.password === password);
+    if (validCredential) {
+      setIsLoggedIn(true);
+      setUser(mockUser);
+      setCurrentPage('dashboard');
+      return true;
     }
-    
-    setIsLoading(false);
-  }, []);
-
-  const handleLogin = (email: string, password: string, role: 'student' | 'tutor') => {
-    // Simulate login - in real app, this would be an API call
-    const user: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-      email,
-      role,
-      department: role === 'student' ? 'Computer Science & Engineering' : undefined,
-      year: role === 'student' ? 3 : undefined,
-      subjects: role === 'tutor' ? ['Programming', 'Data Structures'] : undefined,
-      rating: role === 'tutor' ? 4.8 : undefined,
-      hourlyRate: role === 'tutor' ? 800 : undefined,
-      bio: role === 'tutor' ? 'Experienced tutor passionate about teaching.' : undefined
-    };
-    
-    setCurrentUser(user);
-    
-    // Save to localStorage with timestamp
-    localStorage.setItem('cuet_tuition_user', JSON.stringify(user));
-    localStorage.setItem('cuet_tuition_login_time', Date.now().toString());
-    
-    setIsLoginOpen(false);
-    setActiveTab(role === 'student' ? 'find' : 'dashboard');
-  };
-
-  const handleSignup = (name: string, email: string, password: string, role: 'student' | 'tutor', department?: string, year?: number) => {
-    // Simulate signup - in real app, this would be an API call
-    const user: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      name,
-      email,
-      role,
-      department: role === 'student' ? department : undefined,
-      year: role === 'student' ? year : undefined,
-      subjects: role === 'tutor' ? [] : undefined,
-      rating: role === 'tutor' ? 0 : undefined,
-      hourlyRate: role === 'tutor' ? 0 : undefined,
-      bio: role === 'tutor' ? '' : undefined
-    };
-    
-    setCurrentUser(user);
-    
-    // Save to localStorage with timestamp
-    localStorage.setItem('cuet_tuition_user', JSON.stringify(user));
-    localStorage.setItem('cuet_tuition_login_time', Date.now().toString());
-    
-    setIsSignupOpen(false);
-    setActiveTab(role === 'student' ? 'find' : 'dashboard');
+    return false;
   };
 
   const handleLogout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('cuet_tuition_user');
-    localStorage.removeItem('cuet_tuition_login_time');
-    setActiveTab('find');
+    setIsLoggedIn(false);
+    setUser(null);
+    setCurrentPage('landing');
   };
 
-  const filteredTutors = sampleTutors.filter(tutor => {
-    const matchesSearch = tutor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         tutor.subjects.some(subject => subject.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesDepartment = !selectedDepartment || tutor.department === selectedDepartment;
-    const matchesSubject = !selectedSubject || tutor.subjects.includes(selectedSubject);
-    const matchesPrice = tutor.hourlyRate >= priceRange[0] && tutor.hourlyRate <= priceRange[1];
-    
-    return matchesSearch && matchesDepartment && matchesSubject && matchesPrice;
+  const filteredTuitions = mockTuitions.filter(tuition => {
+    const matchesSearch = tuition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         tuition.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         tuition.tutor.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSubject = selectedSubject === 'All' || tuition.subject === selectedSubject;
+    return matchesSearch && matchesSubject;
   });
 
-  const allSubjects = Array.from(new Set(sampleTutors.flatMap(tutor => tutor.subjects)));
+  const subjects = ['All', ...Array.from(new Set(mockTuitions.map(t => t.subject)))];
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Mentor Wave...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
+  const renderLanding = () => (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="bg-indigo-600 p-2 rounded-lg">
-                <BookOpen className="h-6 w-6 text-white" />
+            <div className="flex items-center space-x-2">
+              <BookOpen className="h-8 w-8 text-blue-600" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                CUET Tuition Hub
+              </span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setCurrentPage('login')}
+                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => setCurrentPage('register')}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+        <div className="text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Connect, Learn, and
+            <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent"> Excel Together</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            The premier tutoring platform for CUET students. Find experienced tutors, offer your expertise, 
+            and build a thriving academic community.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <button
+              onClick={() => setCurrentPage('register')}
+              className="bg-blue-600 text-white px-8 py-3 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              Start Tutoring
+            </button>
+            <button
+              onClick={() => setCurrentPage('login')}
+              className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-xl text-lg font-semibold hover:bg-blue-50 transition-all duration-200"
+            >
+              Find a Tutor
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      <div className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="p-6">
+              <div className="text-4xl font-bold text-blue-600 mb-2">500+</div>
+              <div className="text-gray-600">Active Tutors</div>
+            </div>
+            <div className="p-6">
+              <div className="text-4xl font-bold text-green-600 mb-2">1,200+</div>
+              <div className="text-gray-600">Students Helped</div>
+            </div>
+            <div className="p-6">
+              <div className="text-4xl font-bold text-purple-600 mb-2">50+</div>
+              <div className="text-gray-600">Subjects Available</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Why Choose CUET Tuition Hub?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: <User className="h-12 w-12 text-blue-600" />,
+                title: "Verified CUET Students",
+                description: "All tutors are verified CUET students with proven academic excellence"
+              },
+              {
+                icon: <BookOpen className="h-12 w-12 text-green-600" />,
+                title: "Wide Subject Range",
+                description: "From basic subjects to advanced engineering topics, we cover it all"
+              },
+              {
+                icon: <MapPin className="h-12 w-12 text-purple-600" />,
+                title: "Flexible Locations",
+                description: "Choose between online sessions or in-person meetings in Chittagong"
+              },
+              {
+                icon: <DollarSign className="h-12 w-12 text-orange-600" />,
+                title: "Affordable Rates",
+                description: "Student-friendly pricing that won't break the bank"
+              }
+            ].map((feature, index) => (
+              <div key={index} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
+                <div className="text-center">
+                  <div className="mx-auto mb-4 flex justify-center">{feature.icon}</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderLogin = () => (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="bg-white rounded-xl shadow-2xl p-8">
+          <div className="text-center">
+            <BookOpen className="mx-auto h-12 w-12 text-blue-600" />
+            <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome Back</h2>
+            <p className="mt-2 text-gray-600">Sign in to your CUET Tuition account</p>
+          </div>
+          <form className="mt-8 space-y-6" onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const email = formData.get('email') as string;
+            const password = formData.get('password') as string;
+            const success = handleLogin(email, password);
+            if (!success) {
+              alert('Invalid credentials. Please use demo credentials.');
+            }
+          }}>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="your.email@student.cuet.ac.bd"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Mentor Wave </h1>
-                <p className="text-xs text-gray-500">Connect • Learn • Excel</p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <input
+                  name="password"
+                  type="password"
+                  required
+                  placeholder="Enter your password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
               </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <button
-                onClick={() => setActiveTab('find')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === 'find' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
-                }`}
-              >
-                Find Tutors
-              </button>
-              <button
-                onClick={() => setActiveTab('become')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === 'become' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
-                }`}
-              >
-                Become a Tutor
-              </button>
-              {currentUser && (
-                <button
-                  onClick={() => setActiveTab('dashboard')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === 'dashboard' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
-                  }`}
-                >
-                  Dashboard
-                </button>
-              )}
-            </nav>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-medium text-blue-900 mb-2">Demo Login Credentials:</h4>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p><strong>Email:</strong> ahmed.hassan@student.cuet.ac.bd</p>
+                <p><strong>Password:</strong> demo123</p>
+                <p className="text-xs mt-2">Or use any other demo email with password: demo123</p>
+              </div>
+            </div>
 
-            {/* User Menu */}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+            >
+              Sign In
+            </button>
+          </form>
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Don't have an account?{' '}
+              <button
+                onClick={() => setCurrentPage('register')}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Sign up here
+              </button>
+            </p>
+            <button
+              onClick={() => setCurrentPage('landing')}
+              className="mt-2 text-gray-500 hover:text-gray-700 text-sm"
+            >
+              ← Back to home
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderRegister = () => (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="bg-white rounded-xl shadow-2xl p-8">
+          <div className="text-center">
+            <BookOpen className="mx-auto h-12 w-12 text-blue-600" />
+            <h2 className="mt-6 text-3xl font-bold text-gray-900">Join CUET Tuition Hub</h2>
+            <p className="mt-2 text-gray-600">Create your account to start tutoring or learning</p>
+          </div>
+          <form className="mt-8 space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ahmed"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Hassan"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">CUET Email</label>
+              <input
+                type="email"
+                required
+                placeholder="your.name@student.cuet.ac.bd"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                  <option>CSE</option>
+                  <option>EEE</option>
+                  <option>CE</option>
+                  <option>ME</option>
+                  <option>ChE</option>
+                  <option>Architecture</option>
+                  <option>URP</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                  <option>1st Year</option>
+                  <option>2nd Year</option>
+                  <option>3rd Year</option>
+                  <option>4th Year</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <input
+                type="password"
+                required
+                placeholder="Create a strong password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+              <input
+                type="password"
+                required
+                placeholder="Confirm your password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+            >
+              Create Account
+            </button>
+          </form>
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Already have an account?{' '}
+              <button
+                onClick={() => setCurrentPage('login')}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Sign in here
+              </button>
+            </p>
+            <button
+              onClick={() => setCurrentPage('landing')}
+              className="mt-2 text-gray-500 hover:text-gray-700 text-sm"
+            >
+              ← Back to home
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderDashboard = () => (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <BookOpen className="h-8 w-8 text-blue-600" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                CUET Tuition Hub
+              </span>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-6">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <Home className="h-4 w-4" />
+                <span>Dashboard</span>
+              </button>
+              <button
+                onClick={() => setCurrentPage('post-tuition')}
+                className="flex items-center space-x-1 text-gray-600 hover:text-gray-700 font-medium"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Post Tuition</span>
+              </button>
+              <button
+                onClick={() => setCurrentPage('profile')}
+                className="flex items-center space-x-1 text-gray-600 hover:text-gray-700 font-medium"
+              >
+                <User className="h-4 w-4" />
+                <span>Profile</span>
+              </button>
+            </div>
+
             <div className="flex items-center space-x-4">
-              {currentUser ? (
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
-                      <User className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="hidden sm:block">
-                      <p className="text-sm font-medium text-gray-900">{currentUser.name}</p>
-                      <p className="text-xs text-gray-500 capitalize">{currentUser.role}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                    title="Logout"
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => setIsLoginOpen(true)}
-                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => setIsSignupOpen(true)}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
-                  >
-                    Sign Up
-                  </button>
-                </div>
-              )}
-
-              {/* Mobile menu button */}
+              <div className="hidden md:flex items-center space-x-3">
+                <img
+                  src={user?.avatar}
+                  alt={user?.name}
+                  className="h-8 w-8 rounded-full"
+                />
+                <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-red-600 transition-colors"
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                className="md:hidden text-gray-600"
               >
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
             </div>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
+        
+        {/* Mobile menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-200">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+            <div className="px-4 py-2 space-y-2">
               <button
-                onClick={() => {
-                  setActiveTab('find');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left ${
-                  activeTab === 'find' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
-                }`}
+                onClick={() => {setCurrentPage('dashboard'); setIsMobileMenuOpen(false);}}
+                className="block w-full text-left px-3 py-2 text-blue-600 font-medium"
               >
-                Find Tutors
+                Dashboard
               </button>
               <button
-                onClick={() => {
-                  setActiveTab('become');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left ${
-                  activeTab === 'become' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
-                }`}
+                onClick={() => {setCurrentPage('post-tuition'); setIsMobileMenuOpen(false);}}
+                className="block w-full text-left px-3 py-2 text-gray-600"
               >
-                Become a Tutor
+                Post Tuition
               </button>
-              {currentUser && (
-                <button
-                  onClick={() => {
-                    setActiveTab('dashboard');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left ${
-                    activeTab === 'dashboard' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600'
-                  }`}
-                >
-                  Dashboard
-                </button>
-              )}
+              <button
+                onClick={() => {setCurrentPage('profile'); setIsMobileMenuOpen(false);}}
+                className="block w-full text-left px-3 py-2 text-gray-600"
+              >
+                Profile
+              </button>
             </div>
           </div>
         )}
       </header>
 
+      {/* Search and Filters */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search tuitions, subjects, or tutors..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Filter className="h-5 w-5 text-gray-400" />
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {subjects.map(subject => (
+                  <option key={subject} value={subject}>{subject}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'find' && (
-          <div className="space-y-8">
-            {/* Hero Section */}
-            <div className="text-center space-y-4">
-              <h2 className="text-4xl font-bold text-gray-900">Find Your Perfect Tutor</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Connect with experienced CUET students and alumni who can help you excel in your studies
-              </p>
-            </div>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Available Tuitions</h1>
+          <button
+            onClick={() => setCurrentPage('post-tuition')}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Post New Tuition</span>
+          </button>
+        </div>
 
-            {/* Search and Filters */}
-            <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-              <div className="flex flex-col lg:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <input
-                    type="text"
-                    placeholder="Search by tutor name or subject..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  />
+        {/* Tuition Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTuitions.map((tuition) => (
+            <div key={tuition.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">{tuition.title}</h3>
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                    {tuition.subject}
+                  </span>
                 </div>
-                <button className="lg:w-auto w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2">
-                  <Filter className="h-5 w-5" />
-                  <span>Search</span>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <BookOpen className="h-4 w-4" />
+                    <span>{tuition.level}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{tuition.location}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Clock className="h-4 w-4" />
+                    <span>{tuition.schedule}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm font-semibold text-green-600">
+                    <DollarSign className="h-4 w-4" />
+                    <span>{tuition.fee}</span>
+                  </div>
+                </div>
+
+                <p className="text-gray-700 text-sm mb-4 line-clamp-3">{tuition.description}</p>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <img
+                      src={tuition.tutor.avatar}
+                      alt={tuition.tutor.name}
+                      className="h-10 w-10 rounded-full"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">{tuition.tutor.name}</p>
+                      <p className="text-xs text-gray-600">{tuition.tutor.department} • {tuition.tutor.year}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                    <span className="text-sm font-medium text-gray-700">{tuition.tutor.rating}</span>
+                  </div>
+                </div>
+
+                <button className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium">
+                  Contact Tutor
                 </button>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <select
-                  value={selectedDepartment}
-                  onChange={(e) => setSelectedDepartment(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">All Departments</option>
-                  {departments.map(dept => (
-                    <option key={dept} value={dept}>{dept}</option>
-                  ))}
-                </select>
-
-                <select
-                  value={selectedSubject}
-                  onChange={(e) => setSelectedSubject(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">All Subjects</option>
-                  {allSubjects.map(subject => (
-                    <option key={subject} value={subject}>{subject}</option>
-                  ))}
-                </select>
-
-                <div className="flex items-center space-x-2">
-                  <DollarSign className="h-5 w-5 text-gray-400" />
-                  <input
-                    type="range"
-                    min="0"
-                    max="2000"
-                    step="50"
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                    className="flex-1"
-                  />
-                  <span className="text-sm text-gray-600">৳{priceRange[1]}</span>
-                </div>
-              </div>
             </div>
+          ))}
+        </div>
 
-            {/* Tutors Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredTutors.map((tutor) => (
-                <div key={tutor.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
-                  <div className="flex items-start space-x-4 mb-4">
-                    <img
-                      src={tutor.avatar}
-                      alt={tutor.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{tutor.name}</h3>
-                      <p className="text-sm text-gray-600">{tutor.department}</p>
-                      <div className="flex items-center space-x-1 mt-1">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="text-sm font-medium">{tutor.rating}</span>
-                        <span className="text-sm text-gray-500">({tutor.reviews} reviews)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 mb-1">Subjects:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {tutor.subjects.map((subject, index) => (
-                          <span key={index} className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">
-                            {subject}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="h-4 w-4" />
-                        <span>{tutor.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{tutor.experience}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="text-lg font-bold text-indigo-600">
-                        ৳{tutor.hourlyRate}/hour
-                      </div>
-                      <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-1">
-                        <MessageCircle className="h-4 w-4" />
-                        <span>Contact</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {filteredTutors.length === 0 && (
-              <div className="text-center py-12">
-                <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No tutors found</h3>
-                <p className="text-gray-600">Try adjusting your search criteria to find more tutors.</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'become' && (
-          <div className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center space-y-4">
-              <h2 className="text-4xl font-bold text-gray-900">Become a Tutor</h2>
-              <p className="text-xl text-gray-600">
-                Share your knowledge, help fellow students, and earn money while making a difference
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              <div className="text-center space-y-4">
-                <div className="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                  <GraduationCap className="h-8 w-8 text-indigo-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">Share Knowledge</h3>
-                <p className="text-gray-600">Help fellow CUET students succeed in their academic journey</p>
-              </div>
-              <div className="text-center space-y-4">
-                <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                  <DollarSign className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">Earn Money</h3>
-                <p className="text-gray-600">Set your own rates and work on your own schedule</p>
-              </div>
-              <div className="text-center space-y-4">
-                <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                  <Heart className="h-8 w-8 text-purple-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">Make Impact</h3>
-                <p className="text-gray-600">Build meaningful connections and contribute to the community</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Ready to get started?</h3>
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-gray-900">Requirements:</h4>
-                    <ul className="space-y-2 text-gray-600">
-                      <li className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
-                        <span>Current CUET student or recent graduate</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
-                        <span>Strong academic performance in your subjects</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
-                        <span>Passion for teaching and helping others</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
-                        <span>Good communication skills</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-gray-900">Benefits:</h4>
-                    <ul className="space-y-2 text-gray-600">
-                      <li className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                        <span>Flexible scheduling</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                        <span>Competitive hourly rates (৳500-2000/hour)</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                        <span>Build your teaching portfolio</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                        <span>Connect with fellow students</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <button
-                    onClick={() => setIsSignupOpen(true)}
-                    className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition-colors inline-flex items-center space-x-2"
-                  >
-                    <span>Join as a Tutor</span>
-                    <ArrowRight className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'dashboard' && currentUser && (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900">Welcome back, {currentUser.name}!</h2>
-                <p className="text-gray-600 capitalize">Your {currentUser.role} dashboard</p>
-              </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center">
-                    <User className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{currentUser.name}</p>
-                    <p className="text-sm text-gray-500">{currentUser.email}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {currentUser.role === 'student' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <BookOpen className="h-8 w-8 text-indigo-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">My Sessions</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">12</p>
-                  <p className="text-sm text-gray-600">Total sessions completed</p>
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <Users className="h-8 w-8 text-green-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Active Tutors</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">3</p>
-                  <p className="text-sm text-gray-600">Currently learning from</p>
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <Star className="h-8 w-8 text-yellow-500" />
-                    <h3 className="text-lg font-semibold text-gray-900">Average Rating</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">4.8</p>
-                  <p className="text-sm text-gray-600">From your tutors</p>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <Users className="h-8 w-8 text-indigo-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Students</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">24</p>
-                  <p className="text-sm text-gray-600">Total students taught</p>
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <Clock className="h-8 w-8 text-green-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Hours</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">156</p>
-                  <p className="text-sm text-gray-600">Total teaching hours</p>
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <Star className="h-8 w-8 text-yellow-500" />
-                    <h3 className="text-lg font-semibold text-gray-900">Rating</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">{currentUser.rating || 4.9}</p>
-                  <p className="text-sm text-gray-600">Average from students</p>
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <DollarSign className="h-8 w-8 text-purple-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Earnings</h3>
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">৳45,600</p>
-                  <p className="text-sm text-gray-600">Total earned</p>
-                </div>
-              </div>
-            )}
-
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <MessageCircle className="h-5 w-5 text-indigo-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">New message from Sarah Ahmed</p>
-                    <p className="text-sm text-gray-600">2 hours ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <BookOpen className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">Session completed with Rafiq Hassan</p>
-                    <p className="text-sm text-gray-600">1 day ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <Star className="h-5 w-5 text-yellow-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">Received 5-star rating</p>
-                    <p className="text-sm text-gray-600">3 days ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {filteredTuitions.length === 0 && (
+          <div className="text-center py-12">
+            <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No tuitions found</h3>
+            <p className="text-gray-600">Try adjusting your search criteria or post a new tuition.</p>
           </div>
         )}
       </main>
+    </div>
+  );
 
-      {/* Login Modal */}
-      {isLoginOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
+  const renderPostTuition = () => (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header - Same as dashboard */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <BookOpen className="h-8 w-8 text-blue-600" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                CUET Tuition Hub
+              </span>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-6">
               <button
-                onClick={() => setIsLoginOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={() => setCurrentPage('dashboard')}
+                className="flex items-center space-x-1 text-gray-600 hover:text-gray-700 font-medium"
               >
-                <X className="h-6 w-6" />
+                <Home className="h-4 w-4" />
+                <span>Dashboard</span>
+              </button>
+              <button
+                onClick={() => setCurrentPage('post-tuition')}
+                className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Post Tuition</span>
+              </button>
+              <button
+                onClick={() => setCurrentPage('profile')}
+                className="flex items-center space-x-1 text-gray-600 hover:text-gray-700 font-medium"
+              >
+                <User className="h-4 w-4" />
+                <span>Profile</span>
               </button>
             </div>
 
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target as HTMLFormElement);
-              handleLogin(
-                formData.get('email') as string,
-                formData.get('password') as string,
-                formData.get('role') as 'student' | 'tutor'
-              );
-            }} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="your.email@cuet.ac.bd"
+            <div className="flex items-center space-x-4">
+              <div className="hidden md:flex items-center space-x-3">
+                <img
+                  src={user?.avatar}
+                  alt={user?.name}
+                  className="h-8 w-8 rounded-full"
                 />
+                <span className="text-sm font-medium text-gray-700">{user?.name}</span>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="Enter your password"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">I am a:</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="role" value="student" defaultChecked className="text-indigo-600" />
-                    <span>Student</span>
-                  </label>
-                  <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="role" value="tutor" className="text-indigo-600" />
-                    <span>Tutor</span>
-                  </label>
-                </div>
-              </div>
-
               <button
-                type="submit"
-                className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-red-600 transition-colors"
               >
-                Sign In
+                <LogOut className="h-5 w-5" />
               </button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-600">
-                Don't have an account?{' '}
-                <button
-                  onClick={() => {
-                    setIsLoginOpen(false);
-                    setIsSignupOpen(true);
-                  }}
-                  className="text-indigo-600 hover:text-indigo-700 font-medium"
-                >
-                  Sign up
-                </button>
-              </p>
             </div>
           </div>
         </div>
-      )}
+      </header>
 
-      {/* Signup Modal */}
-      {isSignupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Join CUET Tuition Hub</h2>
-              <button
-                onClick={() => setIsSignupOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Post a New Tuition</h1>
+          <p className="text-gray-600 mb-8">Share your expertise and help fellow students succeed</p>
 
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target as HTMLFormElement);
-              handleSignup(
-                formData.get('name') as string,
-                formData.get('email') as string,
-                formData.get('password') as string,
-                formData.get('role') as 'student' | 'tutor',
-                formData.get('department') as string,
-                parseInt(formData.get('year') as string)
-              );
-            }} className="space-y-4">
+          <form className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tuition Title</label>
                 <input
                   type="text"
-                  name="name"
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="Your full name"
+                  placeholder="e.g., Advanced Mathematics Tutoring"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="your.email@cuet.ac.bd"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="Create a strong password"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">I am a:</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="role" value="student" defaultChecked className="text-indigo-600" />
-                    <span>Student</span>
-                  </label>
-                  <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="role" value="tutor" className="text-indigo-600" />
-                    <span>Tutor</span>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
-                <select
-                  name="department"
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">Select your department</option>
-                  {departments.map(dept => (
-                    <option key={dept} value={dept}>{dept}</option>
-                  ))}
+                <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option>Mathematics</option>
+                  <option>Physics</option>
+                  <option>Chemistry</option>
+                  <option>Biology</option>
+                  <option>English</option>
+                  <option>Programming</option>
+                  <option>Engineering</option>
                 </select>
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Year of Study</label>
-                <select
-                  name="year"
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">Select year</option>
-                  <option value="1">1st Year</option>
-                  <option value="2">2nd Year</option>
-                  <option value="3">3rd Year</option>
-                  <option value="4">4th Year</option>
-                  <option value="5">Graduate</option>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Education Level</label>
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option>HSC</option>
+                  <option>SSC</option>
+                  <option>University</option>
+                  <option>Admission Test</option>
                 </select>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option>Online</option>
+                  <option>Chittagong</option>
+                  <option>CUET Campus</option>
+                  <option>Online/Chittagong</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Monthly Fee (BDT)</label>
+                <input
+                  type="number"
+                  placeholder="3000"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Schedule</label>
+              <input
+                type="text"
+                placeholder="e.g., Mon, Wed, Fri - 7:00 PM"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <textarea
+                rows={4}
+                placeholder="Describe your tutoring approach, experience, and what students can expect..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Requirements</label>
+              <textarea
+                rows={3}
+                placeholder="List any requirements for students (e.g., textbooks, materials, etc.)"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-4 pt-6">
+              <button
+                type="button"
+                onClick={() => setCurrentPage('dashboard')}
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200"
+              >
+                Cancel
+              </button>
               <button
                 type="submit"
-                className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                Create Account
+                Post Tuition
               </button>
-            </form>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  );
 
-            <div className="mt-6 text-center">
-              <p className="text-gray-600">
-                Already have an account?{' '}
-                <button
-                  onClick={() => {
-                    setIsSignupOpen(false);
-                    setIsLoginOpen(true);
-                  }}
-                  className="text-indigo-600 hover:text-indigo-700 font-medium"
-                >
-                  Sign in
-                </button>
-              </p>
+  const renderProfile = () => (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header - Same as dashboard */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <BookOpen className="h-8 w-8 text-blue-600" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                CUET Tuition Hub
+              </span>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-6">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="flex items-center space-x-1 text-gray-600 hover:text-gray-700 font-medium"
+              >
+                <Home className="h-4 w-4" />
+                <span>Dashboard</span>
+              </button>
+              <button
+                onClick={() => setCurrentPage('post-tuition')}
+                className="flex items-center space-x-1 text-gray-600 hover:text-gray-700 font-medium"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Post Tuition</span>
+              </button>
+              <button
+                onClick={() => setCurrentPage('profile')}
+                className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <User className="h-4 w-4" />
+                <span>Profile</span>
+              </button>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="hidden md:flex items-center space-x-3">
+                <img
+                  src={user?.avatar}
+                  alt={user?.name}
+                  className="h-8 w-8 rounded-full"
+                />
+                <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-red-600 transition-colors"
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
             </div>
           </div>
         </div>
-      )}
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Profile Info */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="text-center">
+                <img
+                  src={user?.avatar}
+                  alt={user?.name}
+                  className="h-24 w-24 rounded-full mx-auto mb-4"
+                />
+                <h2 className="text-2xl font-bold text-gray-900">{user?.name}</h2>
+                <p className="text-gray-600">{user?.department}</p>
+                <p className="text-sm text-gray-500">{user?.year}</p>
+                
+                <div className="flex justify-center items-center space-x-4 mt-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{user?.rating}</div>
+                    <div className="text-xs text-gray-500">Rating</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{user?.totalStudents}</div>
+                    <div className="text-xs text-gray-500">Students</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Subjects</h3>
+                <div className="flex flex-wrap gap-2">
+                  {user?.subjects.map((subject, index) => (
+                    <span
+                      key={index}
+                      className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full"
+                    >
+                      {subject}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Bio</h3>
+                <p className="text-gray-600 text-sm">{user?.bio}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Profile Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Settings */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Account Settings</h2>
+              <form className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                    <input
+                      type="text"
+                      defaultValue="Ahmed"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                    <input
+                      type="text"
+                      defaultValue="Hassan"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    defaultValue={user?.email}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                  <textarea
+                    rows={4}
+                    defaultValue={user?.bio}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Subjects You Teach</label>
+                  <input
+                    type="text"
+                    defaultValue={user?.subjects.join(', ')}
+                    placeholder="Mathematics, Physics, Programming..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Update Profile
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+
+  return (
+    <div className="App">
+      {!isLoggedIn && currentPage === 'landing' && renderLanding()}
+      {!isLoggedIn && currentPage === 'login' && renderLogin()}
+      {!isLoggedIn && currentPage === 'register' && renderRegister()}
+      {isLoggedIn && currentPage === 'dashboard' && renderDashboard()}
+      {isLoggedIn && currentPage === 'post-tuition' && renderPostTuition()}
+      {isLoggedIn && currentPage === 'profile' && renderProfile()}
     </div>
   );
 }

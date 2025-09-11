@@ -1,1 +1,0 @@
-cuet_tuition_hub
