@@ -546,6 +546,12 @@ function App() {
           type={registerType}
           onClose={() => setShowRegisterModal(false)} 
           onSubmit={handleRegister} 
+        <PostTuitionModal 
+          onClose={() => setShowPostModal(false)}
+          onSubmit={(formData) => {
+            alert('Tuition posted successfully!');
+            setShowPostModal(false);
+          }}
         />
       )}
     </div>
@@ -566,46 +572,6 @@ function App() {
       }
     };
 
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-          <h3 className="text-xl font-bold mb-4">Post New Tuition</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Title"
-              value={formData.title}
-              onChange={(e) => setFormData({...formData, title: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-            <textarea
-              placeholder="Description"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              rows="3"
-            />
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setShowPostModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Post
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
@@ -683,7 +649,7 @@ function App() {
   };
 
   // Post Tuition Modal Component
-  const PostTuitionModal = () => {
+  const PostTuitionModal = ({ onClose, onSubmit }) => {
     const [formData, setFormData] = useState({
       title: '',
       description: '',
@@ -697,8 +663,7 @@ function App() {
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      alert('Tuition posted successfully!');
-      setShowPostModal(false);
+      onSubmit(formData);
       setFormData({
         title: '',
         description: '',
@@ -710,3 +675,71 @@ function App() {
         preferredTutor: ''
       });
     };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+          <h3 className="text-xl font-bold mb-4">Post New Tuition</h3>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Title"
+              value={formData.title}
+              onChange={(e) => setFormData({...formData, title: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+              required
+            />
+            <textarea
+              placeholder="Description"
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+              rows="3"
+            />
+            <input
+              type="text"
+              placeholder="Student Level (e.g., HSC 1st year)"
+              value={formData.studentLevel}
+              onChange={(e) => setFormData({...formData, studentLevel: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+            <input
+              type="text"
+              placeholder="Location"
+              value={formData.location}
+              onChange={(e) => setFormData({...formData, location: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+            <input
+              type="text"
+              placeholder="Subjects (comma separated)"
+              onChange={(e) => setFormData({...formData, subjects: e.target.value.split(',')})}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+            <input
+              type="text"
+              placeholder="Salary"
+              value={formData.salary}
+              onChange={(e) => setFormData({...formData, salary: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Post
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
