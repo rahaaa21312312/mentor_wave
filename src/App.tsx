@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { 
+import { GraduationCap, Users, BookOpen, Star, MapPin, Phone, Mail, User, CreditCard, Calendar, Clock, Award, TrendingUp, LogIn, Eye, EyeOff } from 'lucide-react';
   Search, 
   MapPin, 
   Clock, 
@@ -292,6 +292,55 @@ const demoUsers = [
 function App() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
+  // Demo accounts
+  const demoAccounts = {
+    'u2204078@student.cuet.ac.bd': {
+      password: 'demo123',
+      type: 'tutor',
+      name: 'Ahmed Rahman',
+      studentId: 'u2204078',
+      department: 'Computer Science & Engineering',
+      year: '3rd Year',
+      subjects: ['Mathematics', 'Physics', 'Programming'],
+      rating: 4.8,
+      completedSessions: 45
+    },
+    'guardian@gmail.com': {
+      password: 'demo123',
+      type: 'guardian',
+      name: 'Mrs. Fatima Khan',
+      nid: '1234567890123',
+      phone: '+880 1712-345678',
+      children: ['Rashid Khan - Class 10', 'Ayesha Khan - Class 8']
+    }
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const account = demoAccounts[loginEmail];
+    
+    if (account && account.password === loginPassword) {
+      setIsLoggedIn(true);
+      setLoggedInUser(account);
+      setCurrentView('dashboard');
+    } else {
+      alert('Invalid credentials. Use demo accounts:\n\nTutor: u2204078@student.cuet.ac.bd / demo123\nGuardian: guardian@gmail.com / demo123');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setLoggedInUser(null);
+    setLoginEmail('');
+    setLoginPassword('');
+    setCurrentView('home');
+  };
   const [currentUser, setCurrentUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -549,6 +598,218 @@ function App() {
         />
       )}
     </div>
+      {currentView === 'login' && (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
+          <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <LogIn className="w-8 h-8 text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
+              <p className="text-gray-600 mt-2">Sign in to your account</p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                    placeholder="Enter your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Sign In
+              </button>
+            </form>
+
+            <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+              <h3 className="font-semibold text-gray-800 mb-3">Demo Accounts:</h3>
+              <div className="space-y-3 text-sm">
+                <div className="bg-white p-3 rounded border">
+                  <p className="font-medium text-blue-600">Tutor Account</p>
+                  <p className="text-gray-600">Email: u2204078@student.cuet.ac.bd</p>
+                  <p className="text-gray-600">Password: demo123</p>
+                </div>
+                <div className="bg-white p-3 rounded border">
+                  <p className="font-medium text-green-600">Guardian Account</p>
+                  <p className="text-gray-600">Email: guardian@gmail.com</p>
+                  <p className="text-gray-600">Password: demo123</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mt-6">
+              <p className="text-gray-600">
+                Don't have an account?{' '}
+                <button 
+                  onClick={() => setCurrentView('register')}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Sign up here
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {currentView === 'dashboard' && isLoggedIn && (
+        <div className="min-h-screen bg-gray-50 py-8">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                  <User className="w-8 h-8 text-blue-600" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-800">{loggedInUser.name}</h1>
+                  <p className="text-gray-600 capitalize">{loggedInUser.type} Dashboard</p>
+                </div>
+              </div>
+
+              {loggedInUser.type === 'tutor' && (
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="bg-blue-50 p-6 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-gray-800">Student Info</h3>
+                      <GraduationCap className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <p className="text-sm text-gray-600">Student ID: {loggedInUser.studentId}</p>
+                    <p className="text-sm text-gray-600">Department: {loggedInUser.department}</p>
+                    <p className="text-sm text-gray-600">Year: {loggedInUser.year}</p>
+                  </div>
+
+                  <div className="bg-green-50 p-6 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-gray-800">Performance</h3>
+                      <Star className="w-6 h-6 text-green-600" />
+                    </div>
+                    <p className="text-2xl font-bold text-green-600">{loggedInUser.rating}</p>
+                    <p className="text-sm text-gray-600">Average Rating</p>
+                    <p className="text-sm text-gray-600">{loggedInUser.completedSessions} sessions completed</p>
+                  </div>
+
+                  <div className="bg-purple-50 p-6 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-gray-800">Subjects</h3>
+                      <BookOpen className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div className="space-y-1">
+                      {loggedInUser.subjects.map((subject, index) => (
+                        <span key={index} className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded mr-1 mb-1">
+                          {subject}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {loggedInUser.type === 'guardian' && (
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-blue-50 p-6 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-gray-800">Contact Info</h3>
+                      <Phone className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <p className="text-sm text-gray-600">NID: {loggedInUser.nid}</p>
+                    <p className="text-sm text-gray-600">Phone: {loggedInUser.phone}</p>
+                  </div>
+
+                  <div className="bg-green-50 p-6 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-gray-800">Children</h3>
+                      <Users className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div className="space-y-2">
+                      {loggedInUser.children.map((child, index) => (
+                        <p key={index} className="text-sm text-gray-600">{child}</p>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <h2 className="text-xl font-bold text-gray-800 mb-6">Quick Actions</h2>
+              <div className="grid md:grid-cols-3 gap-4">
+                {loggedInUser.type === 'tutor' ? (
+                  <>
+                    <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <Calendar className="w-6 h-6 text-blue-600 mb-2" />
+                      <h3 className="font-medium text-gray-800">Manage Schedule</h3>
+                      <p className="text-sm text-gray-600">Set your availability</p>
+                    </button>
+                    <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <BookOpen className="w-6 h-6 text-green-600 mb-2" />
+                      <h3 className="font-medium text-gray-800">View Requests</h3>
+                      <p className="text-sm text-gray-600">Check tutoring requests</p>
+                    </button>
+                    <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <TrendingUp className="w-6 h-6 text-purple-600 mb-2" />
+                      <h3 className="font-medium text-gray-800">Earnings</h3>
+                      <p className="text-sm text-gray-600">Track your income</p>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <Users className="w-6 h-6 text-blue-600 mb-2" />
+                      <h3 className="font-medium text-gray-800">Find Tutors</h3>
+                      <p className="text-sm text-gray-600">Search for qualified tutors</p>
+                    </button>
+                    <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <Calendar className="w-6 h-6 text-green-600 mb-2" />
+                      <h3 className="font-medium text-gray-800">Schedule Sessions</h3>
+                      <p className="text-sm text-gray-600">Book tutoring sessions</p>
+                    </button>
+                    <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <CreditCard className="w-6 h-6 text-purple-600 mb-2" />
+                      <h3 className="font-medium text-gray-800">Payment History</h3>
+                      <p className="text-sm text-gray-600">View transaction history</p>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
   );
 
   // Login Page Component
