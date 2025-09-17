@@ -368,6 +368,131 @@ function App() {
     "Hi! I'd like to know more about the schedule and expectations."
   ];
 
+  // Registration Modal Component
+  const RegistrationModal = ({ type, onClose, onSubmit }) => {
+    const [formData, setFormData] = useState({
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      department: '',
+      year: '',
+      phone: ''
+    });
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      if (formData.password !== formData.confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+      onSubmit(formData);
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold">Register as {type === 'tutor' ? 'Tutor' : 'Guardian'}</h3>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+              required
+            />
+            <input
+              type="email"
+              placeholder="CUET Email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+              required
+            />
+            {type === 'tutor' && (
+              <>
+                <select
+                  value={formData.department}
+                  onChange={(e) => setFormData({...formData, department: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  required
+                >
+                  <option value="">Select Department</option>
+                  <option value="CSE">Computer Science & Engineering</option>
+                  <option value="EEE">Electrical & Electronic Engineering</option>
+                  <option value="CE">Civil Engineering</option>
+                  <option value="ME">Mechanical Engineering</option>
+                  <option value="ChE">Chemical Engineering</option>
+                  <option value="PME">Petroleum & Mining Engineering</option>
+                  <option value="ARCH">Architecture</option>
+                  <option value="URP">Urban & Regional Planning</option>
+                </select>
+                <select
+                  value={formData.year}
+                  onChange={(e) => setFormData({...formData, year: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  required
+                >
+                  <option value="">Select Year</option>
+                  <option value="1st Year">1st Year</option>
+                  <option value="2nd Year">2nd Year</option>
+                  <option value="3rd Year">3rd Year</option>
+                  <option value="4th Year">4th Year</option>
+                  <option value="5th Year">5th Year</option>
+                </select>
+              </>
+            )}
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+              required
+            />
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Register
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
   // Landing Page Component
   const LandingPage = () => (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
@@ -546,6 +671,11 @@ function App() {
           type={registerType}
           onClose={() => setShowRegisterModal(false)} 
           onSubmit={handleRegister} 
+        />
+      )}
+
+      {/* Post Tuition Modal */}
+      {showPostModal && (
         <PostTuitionModal 
           onClose={() => setShowPostModal(false)}
           onSubmit={(formData) => {
@@ -743,3 +873,15 @@ function App() {
       </div>
     );
   };
+
+  // Render current page
+  if (currentPage === 'landing') {
+    return <LandingPage />;
+  } else if (currentPage === 'login') {
+    return <LoginPage />;
+  }
+
+  return <div>Dashboard coming soon...</div>;
+}
+
+export default App;
