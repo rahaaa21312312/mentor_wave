@@ -256,30 +256,36 @@ const demoTuitions = [
 
 const demoUsers = [
   {
-    email: "u2204078@student.cuet.ac.bd",
+    email: "ahmed.hassan@student.cuet.ac.bd",
     password: "demo123",
     name: "Ahmed Hassan",
-    studentId: "u2204078",
     department: "Computer Science & Engineering",
     year: "3rd Year",
-    avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    userType: "tutor",
-    rating: 4.7,
-    completedTuitions: 15,
-    subjects: ["Mathematics", "Physics", "Programming"]
+    avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
   },
   {
-    email: "fatima.begum@gmail.com",
+    email: "fatima.rahman@student.cuet.ac.bd",
     password: "demo123",
-    name: "Fatima Begum",
-    avatar: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    userType: "guardian",
-    phone: "+880 1712-345678",
-    nid: "1234567890123",
-    children: [
-      { name: "Rashid Ahmed", class: "HSC 1st Year", school: "Chittagong College" },
-      { name: "Fatima Ahmed", class: "SSC", school: "Chittagong Collegiate School" }
-    ]
+    name: "Fatima Rahman",
+    department: "Architecture",
+    year: "4th Year",
+    avatar: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
+  },
+  {
+    email: "mohammad.ali@student.cuet.ac.bd",
+    password: "demo123",
+    name: "Mohammad Ali Khan",
+    department: "Chemical Engineering",
+    year: "3rd Year",
+    avatar: "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
+  },
+  {
+    email: "sarah.khan@student.cuet.ac.bd",
+    password: "demo123",
+    name: "Sarah Khan",
+    department: "Civil Engineering",
+    year: "2nd Year",
+    avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
   }
 ];
 
@@ -297,7 +303,7 @@ function App() {
   const [message, setMessage] = useState('');
   const [showPostModal, setShowPostModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [registerType, setRegisterType] = useState('guardian');
+  const [registerType, setRegisterType] = useState('tutor');
 
   // Login function
   const handleLogin = (email, password) => {
@@ -361,227 +367,6 @@ function App() {
     "I'm available for this tuition. Please let me know your requirements.",
     "Hi! I'd like to know more about the schedule and expectations."
   ];
-
-  // Registration Modal Component
-  const RegistrationModal = ({ type, onClose, onSubmit }) => {
-    const [formData, setFormData] = useState({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      department: '',
-      year: '',
-      phone: ''
-    });
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      if (formData.password !== formData.confirmPassword) {
-        alert('Passwords do not match');
-        return;
-      }
-      onSubmit(formData);
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold">Register as {type === 'tutor' ? 'Tutor' : 'Guardian'}</h3>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-            <input
-              type="email"
-              placeholder={type === 'tutor' ? 'CUET Email' : 'Personal Email'}
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-            {type === 'tutor' && (
-              <>
-                <select
-                  value={formData.department}
-                  onChange={(e) => setFormData({...formData, department: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  required
-                >
-                  <option value="">Select Department</option>
-                  <option value="CSE">Computer Science & Engineering</option>
-                  <option value="EEE">Electrical & Electronic Engineering</option>
-                  <option value="CE">Civil Engineering</option>
-                  <option value="ME">Mechanical Engineering</option>
-                  <option value="ChE">Chemical Engineering</option>
-                  <option value="PME">Petroleum & Mining Engineering</option>
-                  <option value="ARCH">Architecture</option>
-                  <option value="URP">Urban & Regional Planning</option>
-                </select>
-                <select
-                  value={formData.year}
-                  onChange={(e) => setFormData({...formData, year: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  required
-                >
-                  <option value="">Select Year</option>
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                  <option value="5th Year">5th Year</option>
-                </select>
-              </>
-            )}
-            <input
-              type="tel"
-              placeholder="Phone Number"
-              value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Register
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
-
-  // Post Tuition Modal Component
-  const PostTuitionModal = ({ onClose, onSubmit }) => {
-    const [formData, setFormData] = useState({
-      title: '',
-      description: '',
-      studentLevel: '',
-      location: '',
-      subjects: [],
-      salary: '',
-      additionalInfo: '',
-      preferredTutor: ''
-    });
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      onSubmit(formData);
-      setFormData({
-        title: '',
-        description: '',
-        studentLevel: '',
-        location: '',
-        subjects: [],
-        salary: '',
-        additionalInfo: '',
-        preferredTutor: ''
-      });
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-          <h3 className="text-xl font-bold mb-4">Post New Tuition</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Title"
-              value={formData.title}
-              onChange={(e) => setFormData({...formData, title: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-            <textarea
-              placeholder="Description"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              rows="3"
-            />
-            <input
-              type="text"
-              placeholder="Student Level (e.g., HSC 1st year)"
-              value={formData.studentLevel}
-              onChange={(e) => setFormData({...formData, studentLevel: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-            <input
-              type="text"
-              placeholder="Location"
-              value={formData.location}
-              onChange={(e) => setFormData({...formData, location: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-            <input
-              type="text"
-              placeholder="Subjects (comma separated)"
-              onChange={(e) => setFormData({...formData, subjects: e.target.value.split(',')})}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-            <input
-              type="text"
-              placeholder="Salary"
-              value={formData.salary}
-              onChange={(e) => setFormData({...formData, salary: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Post
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
 
   // Landing Page Component
   const LandingPage = () => (
@@ -763,17 +548,6 @@ function App() {
           onSubmit={handleRegister} 
         />
       )}
-
-      {/* Post Tuition Modal */}
-      {showPostModal && (
-        <PostTuitionModal 
-          onClose={() => setShowPostModal(false)}
-          onSubmit={(formData) => {
-            alert('Tuition posted successfully!');
-            setShowPostModal(false);
-          }}
-        />
-      )}
     </div>
   );
 
@@ -807,14 +581,14 @@ function App() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
+                  CUET Email Address
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your email"
+                  placeholder="your.name@student.cuet.ac.bd"
                   required
                 />
               </div>
@@ -848,24 +622,16 @@ function App() {
 
             <div className="mt-8 p-4 bg-blue-50 rounded-xl">
               <p className="text-sm text-blue-800 font-medium mb-2">Demo Accounts:</p>
-              <div className="space-y-2 text-xs">
-                <div className="bg-green-50 p-2 rounded border border-green-200">
-                  <p className="text-green-800 font-medium">🎓 Tutor Account:</p>
-                  <p className="text-green-700">📧 u2204078@student.cuet.ac.bd</p>
-                  <p className="text-green-700">🔑 demo123</p>
-                </div>
-                <div className="bg-purple-50 p-2 rounded border border-purple-200">
-                  <p className="text-purple-800 font-medium">👨‍👩‍👧‍👦 Guardian Account:</p>
-                  <p className="text-purple-700">📧 fatima.begum@gmail.com</p>
-                  <p className="text-purple-700">🔑 demo123</p>
-                </div>
+              <div className="space-y-1 text-xs text-blue-700">
+                <p>📧 ahmed.hassan@student.cuet.ac.bd</p>
+                <p>🔑 demo123</p>
               </div>
             </div>
 
             <div className="mt-6 text-center">
               <button
                 onClick={() => setCurrentPage('landing')}
-                className="text-blue-600 hover:text-blue-800 text-sm"
+                className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 ← Back to Home
               </button>
@@ -876,54 +642,367 @@ function App() {
     );
   };
 
-  // Dashboard Component (placeholder)
-  const Dashboard = () => (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold">CUET Tuition Hub</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Welcome, {currentUser?.name}</span>
+  // Post Tuition Modal Component
+  const PostTuitionModal = () => {
+    const [formData, setFormData] = useState({
+      title: '',
+      description: '',
+      studentLevel: '',
+      location: '',
+      subjects: [],
+      salary: '',
+      additionalInfo: '',
+      preferredTutor: ''
+    });
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      alert('Tuition posted successfully!');
+      setShowPostModal(false);
+      setFormData({
+        title: '',
+        description: '',
+        studentLevel: '',
+        location: '',
+        subjects: [],
+        salary: '',
+        additionalInfo: '',
+        preferredTutor: ''
+      });
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-gray-900">Post New Tuition</h3>
               <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                onClick={() => setShowPostModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Logout
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
+
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Title *
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g., Math & Physics Tutor Needed"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows="3"
+                placeholder="Brief description of requirements..."
+              />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Student Level *
+                </label>
+                <select
+                  value={formData.studentLevel}
+                  onChange={(e) => setFormData({...formData, studentLevel: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Select Level</option>
+                  <option value="Class 1-5">Class 1-5</option>
+                  <option value="Class 6-8">Class 6-8</option>
+                  <option value="Class 9-10">Class 9-10</option>
+                  <option value="HSC 1st year">HSC 1st year</option>
+                  <option value="HSC 2nd year">HSC 2nd year</option>
+                  <option value="University Admission">University Admission</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Location *
+                </label>
+                <input
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => setFormData({...formData, location: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="e.g., Agrabad, Nasirabad"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subjects *
+              </label>
+              <input
+                type="text"
+                value={formData.subjects.join(', ')}
+                onChange={(e) => setFormData({...formData, subjects: e.target.value.split(', ').filter(s => s.trim())})}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g., Math, Physics, Chemistry"
+                required
+              />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Salary
+                </label>
+                <input
+                  type="text"
+                  value={formData.salary}
+                  onChange={(e) => setFormData({...formData, salary: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="e.g., 8,000-12,000 BDT/month"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Preferred Tutor
+                </label>
+                <select
+                  value={formData.preferredTutor}
+                  onChange={(e) => setFormData({...formData, preferredTutor: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">No preference</option>
+                  <option value="Male tutor preferred">Male tutor preferred</option>
+                  <option value="Female tutor preferred">Female tutor preferred</option>
+                  <option value="Engineering student preferred">Engineering student preferred</option>
+                  <option value="Senior student preferred">Senior student preferred</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Additional Information
+              </label>
+              <textarea
+                value={formData.additionalInfo}
+                onChange={(e) => setFormData({...formData, additionalInfo: e.target.value})}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows="3"
+                placeholder="Schedule, special requirements, etc..."
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setShowPostModal(false)}
+                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+              >
+                Post Tuition
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
-          <p className="text-gray-600 mb-4">
-            Welcome to your dashboard, {currentUser?.name}! 
-            You are logged in as a {currentUser?.userType}.
-          </p>
-          
-          {currentUser?.userType === 'tutor' && (
-            <div className="bg-green-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-green-800">Tutor Profile</h3>
-              <p className="text-green-700">Department: {currentUser.department}</p>
-              <p className="text-green-700">Year: {currentUser.year}</p>
-              <p className="text-green-700">Rating: {currentUser.rating}/5</p>
-              <p className="text-green-700">Completed Tuitions: {currentUser.completedTuitions}</p>
+    );
+  };
+
+  // Contact Modal Component
+  const ContactModal = () => (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-bold text-gray-900">Contact Tutor</h3>
+            <button
+              onClick={() => setShowContactModal(false)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="flex space-x-1 mt-4">
+            <button
+              onClick={() => setActiveContactTab('info')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                activeContactTab === 'info'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Tutor Info
+            </button>
+            <button
+              onClick={() => setActiveContactTab('message')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                activeContactTab === 'message'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Send Message
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6 max-h-[60vh] overflow-y-auto">
+          {activeContactTab === 'info' && selectedTuition && (
+            <div className="space-y-6">
+              {/* Tutor Profile */}
+              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
+                <img
+                  src={selectedTuition.poster.avatar}
+                  alt={selectedTuition.poster.name}
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+                <div className="flex-1">
+                  <h4 className="text-xl font-bold text-gray-900">{selectedTuition.poster.name}</h4>
+                  <p className="text-gray-600">{selectedTuition.poster.department}</p>
+                  <p className="text-sm text-gray-500">{selectedTuition.poster.year}</p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <div className="flex items-center">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-sm font-medium ml-1">{selectedTuition.poster.rating}</span>
+                    </div>
+                    <span className="text-gray-300">•</span>
+                    <span className="text-sm text-gray-600">{selectedTuition.poster.completedTuitions} completed</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tuition Details */}
+              <div className="space-y-4">
+                <div>
+                  <h5 className="font-semibold text-gray-900 mb-2">Tuition Details</h5>
+                  <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <BookOpen className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <span className="font-medium">Subjects:</span>
+                        <span className="ml-2 text-gray-700">{selectedTuition.subjects.join(', ')}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <GraduationCap className="w-5 h-5 text-green-600" />
+                      <div>
+                        <span className="font-medium">Student Level:</span>
+                        <span className="ml-2 text-gray-700">{selectedTuition.studentLevel}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <MapPin className="w-5 h-5 text-red-600" />
+                      <div>
+                        <span className="font-medium">Location:</span>
+                        <span className="ml-2 text-gray-700">{selectedTuition.location}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <DollarSign className="w-5 h-5 text-purple-600" />
+                      <div>
+                        <span className="font-medium">Salary:</span>
+                        <span className="ml-2 text-gray-700">{selectedTuition.salary}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Requirements */}
+                <div>
+                  <h5 className="font-semibold text-gray-900 mb-2">Requirements</h5>
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                    <p className="text-amber-800">{selectedTuition.preferredTutor}</p>
+                    {selectedTuition.additionalInfo && (
+                      <p className="text-amber-700 mt-2">{selectedTuition.additionalInfo}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Contact Options */}
+                <div className="flex space-x-3">
+                  <button className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+                    <MessageCircle className="w-5 h-5" />
+                    <span>Message</span>
+                  </button>
+                  <button className="flex-1 bg-green-600 text-white py-3 rounded-xl font-medium hover:bg-green-700 transition-colors flex items-center justify-center space-x-2">
+                    <Phone className="w-5 h-5" />
+                    <span>Call</span>
+                  </button>
+                </div>
+              </div>
             </div>
           )}
-          
-          {currentUser?.userType === 'guardian' && (
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-purple-800">Guardian Profile</h3>
-              <p className="text-purple-700">Phone: {currentUser.phone}</p>
-              <p className="text-purple-700">Children: {currentUser.children?.length || 0}</p>
+
+          {activeContactTab === 'message' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <img
+                  src={selectedTuition?.poster.avatar}
+                  alt={selectedTuition?.poster.name}
+                  className="w-16 h-16 rounded-full object-cover mx-auto mb-3"
+                />
+                <h4 className="text-lg font-bold text-gray-900">{selectedTuition?.poster.name}</h4>
+                <p className="text-gray-600">{selectedTuition?.poster.department}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Message
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows="4"
+                  placeholder="Type your message here..."
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-3">Quick Templates:</p>
+                <div className="space-y-2">
+                  {quickMessages.map((template, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setMessage(template)}
+                      className="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm text-gray-700 transition-colors"
+                    >
+                      {template}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                onClick={handleSendMessage}
+                disabled={!message.trim()}
+                className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              >
+                <Send className="w-5 h-5" />
+                <span>Send Message</span>
+              </button>
             </div>
           )}
         </div>
@@ -931,16 +1010,658 @@ function App() {
     </div>
   );
 
-  // Render current page
+  // Tuition Card Component
+  const TuitionCard = ({ tuition }) => (
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <img
+            src={tuition.poster.avatar}
+            alt={tuition.poster.name}
+            className="w-12 h-12 rounded-full object-cover"
+          />
+          <div>
+            <h3 className="font-bold text-gray-900">{tuition.poster.name}</h3>
+            <p className="text-sm text-gray-600">{tuition.poster.department}</p>
+            <p className="text-xs text-gray-500">{tuition.timePosted}</p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          {tuition.status === 'booked' && (
+            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
+              #booked
+            </span>
+          )}
+          {tuition.status === 'offering' && (
+            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
+              Offering
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="space-y-3 mb-4">
+        <h4 className="text-lg font-bold text-gray-900">{tuition.title}</h4>
+        {tuition.description && (
+          <p className="text-gray-700">{tuition.description}</p>
+        )}
+        
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <GraduationCap className="w-4 h-4" />
+            <span>Student: {tuition.studentLevel}</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <MapPin className="w-4 h-4" />
+            <span>Location: {tuition.location}</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <BookOpen className="w-4 h-4" />
+            <span>Subjects: {tuition.subjects.join(', ')}</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <DollarSign className="w-4 h-4" />
+            <span>Salary: {tuition.salary}</span>
+          </div>
+          {tuition.preferredTutor && (
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <User className="w-4 h-4" />
+              <span>{tuition.preferredTutor}</span>
+            </div>
+          )}
+          {tuition.additionalInfo && (
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <AlertCircle className="w-4 h-4" />
+              <span>{tuition.additionalInfo}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center space-x-4">
+          <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition-colors">
+            <ThumbsUp className="w-4 h-4" />
+            <span className="text-sm">{tuition.likes}</span>
+          </button>
+          <button className="flex items-center space-x-1 text-gray-600 hover:text-green-600 transition-colors">
+            <MessageCircle className="w-4 h-4" />
+            <span className="text-sm">{tuition.comments}</span>
+          </button>
+          <span className="text-xs text-gray-500">{tuition.likedBy[0]}</span>
+        </div>
+        
+        {tuition.status !== 'booked' && (
+          <button
+            onClick={() => handleContactTutor(tuition)}
+            className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200 flex items-center space-x-2"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>Contact</span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
+  // Dashboard Component
+  const Dashboard = () => (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">CUET Tuition Hub</h1>
+                <p className="text-xs text-gray-500">Connect • Learn • Excel</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setShowPostModal(true)}
+                className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200 flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Post Tuition</span>
+              </button>
+              
+              <div className="flex items-center space-x-3">
+                <img
+                  src={currentUser?.avatar}
+                  alt={currentUser?.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <div className="hidden md:block">
+                  <p className="text-sm font-medium text-gray-900">{currentUser?.name}</p>
+                  <p className="text-xs text-gray-500">{currentUser?.department}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Filters</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Search
+                  </label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Search tuitions..."
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location
+                  </label>
+                  <select
+                    value={selectedLocation}
+                    onChange={(e) => setSelectedLocation(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">All Locations</option>
+                    <option value="Agrabad">Agrabad</option>
+                    <option value="Nasirabad">Nasirabad</option>
+                    <option value="Halishahar">Halishahar</option>
+                    <option value="Andarkilla">Andarkilla</option>
+                    <option value="Khulshi">Khulshi</option>
+                    <option value="Chandgaon">Chandgaon</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Subject
+                  </label>
+                  <select
+                    value={selectedSubject}
+                    onChange={(e) => setSelectedSubject(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">All Subjects</option>
+                    <option value="Math">Mathematics</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="English">English</option>
+                    <option value="Bangla">Bangla</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Student Level
+                  </label>
+                  <select
+                    value={selectedLevel}
+                    onChange={(e) => setSelectedLevel(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">All Levels</option>
+                    <option value="Class">Primary (Class 1-5)</option>
+                    <option value="Class">Secondary (Class 6-10)</option>
+                    <option value="HSC">Higher Secondary (HSC)</option>
+                    <option value="Admission">University Admission</option>
+                  </select>
+                </div>
+
+                <button className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Feed */}
+          <div className="lg:col-span-3">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Available Tuitions</h2>
+              <p className="text-gray-600">
+                {filteredTuitions.length} tuition{filteredTuitions.length !== 1 ? 's' : ''} found
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              {filteredTuitions.map((tuition) => (
+                <TuitionCard key={tuition.id} tuition={tuition} />
+              ))}
+            </div>
+
+            {filteredTuitions.length === 0 && (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No tuitions found</h3>
+                <p className="text-gray-600">Try adjusting your search criteria or post a new tuition request.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* Modals */}
+      {showContactModal && <ContactModal />}
+      {showPostModal && <PostTuitionModal />}
+    </div>
+  );
+
+  // Registration Modal Component
+  const RegistrationModal = ({ type, onClose, onSubmit }) => {
+    const [formData, setFormData] = useState({
+      fullName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phone: '',
+      department: '',
+      studentId: '',
+      year: '',
+      location: '',
+      subjects: '',
+      experience: '',
+      qualification: '',
+      preferredAreas: '',
+      childAge: '',
+      childClass: '',
+      requirements: ''
+    });
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      if (formData.password !== formData.confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+      }
+      onSubmit(formData);
+    };
+
+    const handleChange = (e) => {
+      setFormData(prev => ({
+        ...prev,
+        [e.target.name]: e.target.value
+      }));
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Register as {type === 'tutor' ? 'Tutor' : 'Guardian'}
+              </h2>
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <p className="text-gray-600 mt-2">
+              {type === 'tutor' 
+                ? 'Join as a tutor to share your knowledge and help students excel'
+                : 'Register to find the perfect tutor for your child'
+              }
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="your.email@student.cuet.ac.bd"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password *
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Create a strong password"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirm Password *
+                </label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Confirm your password"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="+880 1XXX-XXXXXX"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Location *
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="e.g., Andarkilla, Chittagong"
+                />
+              </div>
+            </div>
+
+            {/* Tutor-specific fields */}
+            {type === 'tutor' && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Department *
+                    </label>
+                    <select
+                      name="department"
+                      value={formData.department}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      <option value="">Select Department</option>
+                      <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                      <option value="Electrical & Electronic Engineering">Electrical & Electronic Engineering</option>
+                      <option value="Mechanical Engineering">Mechanical Engineering</option>
+                      <option value="Civil Engineering">Civil Engineering</option>
+                      <option value="Architecture">Architecture</option>
+                      <option value="Mathematics">Mathematics</option>
+                      <option value="Physics">Physics</option>
+                      <option value="Chemistry">Chemistry</option>
+                      <option value="Economics">Economics</option>
+                      <option value="Business Administration">Business Administration</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Student ID *
+                    </label>
+                    <input
+                      type="text"
+                      name="studentId"
+                      value={formData.studentId}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 1904XXX"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Current Year *
+                    </label>
+                    <select
+                      name="year"
+                      value={formData.year}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      <option value="">Select Year</option>
+                      <option value="1st Year">1st Year</option>
+                      <option value="2nd Year">2nd Year</option>
+                      <option value="3rd Year">3rd Year</option>
+                      <option value="4th Year">4th Year</option>
+                      <option value="Graduate">Graduate</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Teaching Experience
+                    </label>
+                    <input
+                      type="text"
+                      name="experience"
+                      value={formData.experience}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 2 years"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subjects You Can Teach *
+                  </label>
+                  <input
+                    type="text"
+                    name="subjects"
+                    value={formData.subjects}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="e.g., Mathematics, Physics, Chemistry"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Qualifications & Achievements
+                  </label>
+                  <textarea
+                    name="qualification"
+                    value={formData.qualification}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Describe your academic achievements, certifications, etc."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Preferred Teaching Areas
+                  </label>
+                  <input
+                    type="text"
+                    name="preferredAreas"
+                    value={formData.preferredAreas}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="e.g., Andarkilla, Khulshi, GEC More"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Guardian-specific fields */}
+            {type === 'guardian' && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Child's Age
+                    </label>
+                    <input
+                      type="number"
+                      name="childAge"
+                      value={formData.childAge}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 16"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Child's Class/Level *
+                    </label>
+                    <select
+                      name="childClass"
+                      value={formData.childClass}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      <option value="">Select Class/Level</option>
+                      <option value="Class 6">Class 6</option>
+                      <option value="Class 7">Class 7</option>
+                      <option value="Class 8">Class 8</option>
+                      <option value="Class 9">Class 9</option>
+                      <option value="Class 10">Class 10</option>
+                      <option value="HSC 1st Year">HSC 1st Year</option>
+                      <option value="HSC 2nd Year">HSC 2nd Year</option>
+                      <option value="University Admission">University Admission</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Required Subjects *
+                  </label>
+                  <input
+                    type="text"
+                    name="subjects"
+                    value={formData.subjects}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="e.g., Mathematics, Physics, Chemistry"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Special Requirements
+                  </label>
+                  <textarea
+                    name="requirements"
+                    value={formData.requirements}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Any specific requirements for the tutor (gender preference, experience level, etc.)"
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors ${
+                  type === 'tutor' 
+                    ? 'bg-green-600 hover:bg-green-700' 
+                    : 'bg-purple-600 hover:bg-purple-700'
+                }`}
+              >
+                Register as {type === 'tutor' ? 'Tutor' : 'Guardian'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  // Main App Render
   if (currentPage === 'landing') {
     return <LandingPage />;
   } else if (currentPage === 'login') {
     return <LoginPage />;
-  } else if (currentPage === 'dashboard') {
+  } else if (currentPage === 'dashboard' && isLoggedIn) {
     return <Dashboard />;
   }
 
-  return <div>Page not found</div>;
+  return <LandingPage />;
 }
 
 export default App;
