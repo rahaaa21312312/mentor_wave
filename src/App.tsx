@@ -403,7 +403,7 @@ function App() {
             />
             <input
               type="email"
-              placeholder="CUET Email"
+              placeholder={type === 'tutor' ? 'CUET Email' : 'Personal Email'}
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
               className="w-full px-3 py-2 border rounded-lg"
@@ -479,6 +479,102 @@ function App() {
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Register
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  // Post Tuition Modal Component
+  const PostTuitionModal = ({ onClose, onSubmit }) => {
+    const [formData, setFormData] = useState({
+      title: '',
+      description: '',
+      studentLevel: '',
+      location: '',
+      subjects: [],
+      salary: '',
+      additionalInfo: '',
+      preferredTutor: ''
+    });
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      onSubmit(formData);
+      setFormData({
+        title: '',
+        description: '',
+        studentLevel: '',
+        location: '',
+        subjects: [],
+        salary: '',
+        additionalInfo: '',
+        preferredTutor: ''
+      });
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+          <h3 className="text-xl font-bold mb-4">Post New Tuition</h3>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Title"
+              value={formData.title}
+              onChange={(e) => setFormData({...formData, title: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+              required
+            />
+            <textarea
+              placeholder="Description"
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+              rows="3"
+            />
+            <input
+              type="text"
+              placeholder="Student Level (e.g., HSC 1st year)"
+              value={formData.studentLevel}
+              onChange={(e) => setFormData({...formData, studentLevel: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+            <input
+              type="text"
+              placeholder="Location"
+              value={formData.location}
+              onChange={(e) => setFormData({...formData, location: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+            <input
+              type="text"
+              placeholder="Subjects (comma separated)"
+              onChange={(e) => setFormData({...formData, subjects: e.target.value.split(',')})}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+            <input
+              type="text"
+              placeholder="Salary"
+              value={formData.salary}
+              onChange={(e) => setFormData({...formData, salary: e.target.value})}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Post
               </button>
             </div>
           </form>
@@ -711,14 +807,14 @@ function App() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  CUET Email Address
+                  Email Address
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="your.name@student.cuet.ac.bd"
+                  placeholder="Enter your email"
                   required
                 />
               </div>
@@ -765,113 +861,86 @@ function App() {
                 </div>
               </div>
             </div>
-    );
-  };
 
-  // Post Tuition Modal Component
-  const PostTuitionModal = ({ onClose, onSubmit }) => {
-    const [formData, setFormData] = useState({
-      title: '',
-      description: '',
-      studentLevel: '',
-      location: '',
-      subjects: [],
-      salary: '',
-      additionalInfo: '',
-      preferredTutor: ''
-    });
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      onSubmit(formData);
-      setFormData({
-        title: '',
-        description: '',
-        studentLevel: '',
-        location: '',
-        subjects: [],
-        salary: '',
-        additionalInfo: '',
-        preferredTutor: ''
-      });
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-          <h3 className="text-xl font-bold mb-4">Post New Tuition</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Title"
-              value={formData.title}
-              onChange={(e) => setFormData({...formData, title: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-            <textarea
-              placeholder="Description"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-              rows="3"
-            />
-            <input
-              type="text"
-              placeholder="Student Level (e.g., HSC 1st year)"
-              value={formData.studentLevel}
-              onChange={(e) => setFormData({...formData, studentLevel: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-            <input
-              type="text"
-              placeholder="Location"
-              value={formData.location}
-              onChange={(e) => setFormData({...formData, location: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-            <input
-              type="text"
-              placeholder="Subjects (comma separated)"
-              onChange={(e) => setFormData({...formData, subjects: e.target.value.split(',')})}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-            <input
-              type="text"
-              placeholder="Salary"
-              value={formData.salary}
-              onChange={(e) => setFormData({...formData, salary: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-            <div className="flex gap-4">
+            <div className="mt-6 text-center">
               <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                onClick={() => setCurrentPage('landing')}
+                className="text-blue-600 hover:text-blue-800 text-sm"
               >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Post
+                ← Back to Home
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     );
   };
+
+  // Dashboard Component (placeholder)
+  const Dashboard = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-white" />
+              </div>
+              <h1 className="text-xl font-bold">CUET Tuition Hub</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-600">Welcome, {currentUser?.name}</span>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
+          <p className="text-gray-600 mb-4">
+            Welcome to your dashboard, {currentUser?.name}! 
+            You are logged in as a {currentUser?.userType}.
+          </p>
+          
+          {currentUser?.userType === 'tutor' && (
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-green-800">Tutor Profile</h3>
+              <p className="text-green-700">Department: {currentUser.department}</p>
+              <p className="text-green-700">Year: {currentUser.year}</p>
+              <p className="text-green-700">Rating: {currentUser.rating}/5</p>
+              <p className="text-green-700">Completed Tuitions: {currentUser.completedTuitions}</p>
+            </div>
+          )}
+          
+          {currentUser?.userType === 'guardian' && (
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-purple-800">Guardian Profile</h3>
+              <p className="text-purple-700">Phone: {currentUser.phone}</p>
+              <p className="text-purple-700">Children: {currentUser.children?.length || 0}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   // Render current page
   if (currentPage === 'landing') {
     return <LandingPage />;
   } else if (currentPage === 'login') {
     return <LoginPage />;
+  } else if (currentPage === 'dashboard') {
+    return <Dashboard />;
   }
 
-  return <div>Dashboard coming soon...</div>;
+  return <div>Page not found</div>;
 }
 
 export default App;
