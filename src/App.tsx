@@ -765,21 +765,6 @@ function App() {
                 </div>
               </div>
             </div>
-                <p>🔑 demo123</p>
-              </div>
-            </div>
-
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => setCurrentPage('landing')}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                ← Back to Home
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     );
   };
 
