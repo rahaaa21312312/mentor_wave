@@ -256,36 +256,30 @@ const demoTuitions = [
 
 const demoUsers = [
   {
-    email: "ahmed.hassan@student.cuet.ac.bd",
+    email: "u2204078@student.cuet.ac.bd",
     password: "demo123",
     name: "Ahmed Hassan",
+    studentId: "u2204078",
     department: "Computer Science & Engineering",
     year: "3rd Year",
-    avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
+    avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+    userType: "tutor",
+    rating: 4.7,
+    completedTuitions: 15,
+    subjects: ["Mathematics", "Physics", "Programming"]
   },
   {
-    email: "fatima.rahman@student.cuet.ac.bd",
+    email: "fatima.begum@gmail.com",
     password: "demo123",
-    name: "Fatima Rahman",
-    department: "Architecture",
-    year: "4th Year",
-    avatar: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
-  },
-  {
-    email: "mohammad.ali@student.cuet.ac.bd",
-    password: "demo123",
-    name: "Mohammad Ali Khan",
-    department: "Chemical Engineering",
-    year: "3rd Year",
-    avatar: "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
-  },
-  {
-    email: "sarah.khan@student.cuet.ac.bd",
-    password: "demo123",
-    name: "Sarah Khan",
-    department: "Civil Engineering",
-    year: "2nd Year",
-    avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop"
+    name: "Fatima Begum",
+    avatar: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+    userType: "guardian",
+    phone: "+880 1712-345678",
+    nid: "1234567890123",
+    children: [
+      { name: "Rashid Ahmed", class: "HSC 1st Year", school: "Chittagong College" },
+      { name: "Fatima Ahmed", class: "SSC", school: "Chittagong Collegiate School" }
+    ]
   }
 ];
 
@@ -758,8 +752,19 @@ function App() {
 
             <div className="mt-8 p-4 bg-blue-50 rounded-xl">
               <p className="text-sm text-blue-800 font-medium mb-2">Demo Accounts:</p>
-              <div className="space-y-1 text-xs text-blue-700">
-                <p>📧 ahmed.hassan@student.cuet.ac.bd</p>
+              <div className="space-y-2 text-xs">
+                <div className="bg-green-50 p-2 rounded border border-green-200">
+                  <p className="text-green-800 font-medium">🎓 Tutor Account:</p>
+                  <p className="text-green-700">📧 u2204078@student.cuet.ac.bd</p>
+                  <p className="text-green-700">🔑 demo123</p>
+                </div>
+                <div className="bg-purple-50 p-2 rounded border border-purple-200">
+                  <p className="text-purple-800 font-medium">👨‍👩‍👧‍👦 Guardian Account:</p>
+                  <p className="text-purple-700">📧 fatima.begum@gmail.com</p>
+                  <p className="text-purple-700">🔑 demo123</p>
+                </div>
+              </div>
+            </div>
                 <p>🔑 demo123</p>
               </div>
             </div>
